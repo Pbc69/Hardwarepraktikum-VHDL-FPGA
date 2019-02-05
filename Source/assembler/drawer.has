@@ -48,8 +48,9 @@ clearscreen:
 	jal @ra, *updateFrame
 	
 	; redraw cursor
-	ldui r1, #1
-	store r1, r0, *d*MOUSE_MOVED
+	store r0, r0 *d*mouse_x_next	
+	;ldui r1, #1
+	;store r1, r0, *d*MOUSE_MOVED
 	jmp #ret
 
 rubber:

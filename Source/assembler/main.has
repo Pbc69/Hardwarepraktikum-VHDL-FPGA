@@ -9,8 +9,9 @@
 @inc "mouse.has"
 @inc "mouse_bcd.has"
 @inc "xtimer.has"
-@inc "cursorHandling.has"
+;@inc "cursorHandling.has"
 @inc "drawer.has"
+@inc "cursor.has"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; main function                  ;;
@@ -18,19 +19,17 @@
 
 @code main {
 loop:	
-	;jal @ra, *busyWaitUnblock			;[OLD] BusyWaiting if BlockSwitch is active
 	LOAD r1, @NULL, *d*BLOCKED			;load blocking status
 	BNEZ r1, #loop						;jump back if blocked "busyWait"
 
-	;DEI
+
 	jal @ra, *read_mouse				; 0. read mouse
-	;ENI
 
 	;jal @ra, *fpsHandling				;reworked fps check
 	
-	jal @ra, *removeOldCursor			; 1. remove cursor, and restore old image
+	jal @ra, *cursor_remove				; 1. remove cursor, and restore old image
 	jal @ra, *draw_handling				; 2. Paint
-	jal @ra, *drawCursor				; 3. Save data under cursor and Draw new cursor
+	jal @ra, *cursor_draw				; 3. Save data under cursor and Draw new cursor
 
 	jal @ra, *bcd_switch_timer_check	; Check Timer expired, and updates BCD_Mouse_Output
 	jal @ra, *mouse_coord2bcd			; BCD Output X or Y
