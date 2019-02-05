@@ -1,0 +1,65 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run",
+            "type": "process",
+            "presentation": {
+                "clear": true,
+            },
+            "command": "run.bat",
+            "args": [
+                "hadesXI_13",
+                "${fileBasenameNoExtension}"
+            ],
+            "problemMatcher": []
+            
+        },
+        {
+            "label": "Build",
+            "type": "process",
+            "command": "build.bat",
+            "presentation": {
+                "clear": true,
+            },
+            "args": [
+                "hadesXI_13",
+                "${fileBasenameNoExtension}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "vhdl",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "Waveform",
+            "type": "process",
+            "command": "run.bat",
+            "presentation": {
+                "clear": true,
+            },
+            "args": [
+                "hadesXI_13",
+                "${fileBasenameNoExtension}",
+                "show"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

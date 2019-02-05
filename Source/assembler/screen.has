@@ -1,0 +1,168 @@
+
+@data FPS 			{ #60 @}
+@data FPS_HANDLING 	{ #500, #0 @}
+@data mouse_pos_x 	{ #320	@}
+@data mouse_pos_y 	{ #240	@}
+
+/*
+; Init FPS Handling -> need division!
+@code fps_init{
+	ldui r1, *d*FPS
+	ldui r2, #1000
+@}
+*/
+
+@code fpsHandling{
+	@call ctx_save
+
+	/*
+	in r1, #16
+	load r2, @null, *d*FPS_HANDLING
+
+	ldui r5, #1
+	load r3, r5, *d*FPS_HANDLING
+	sub r3, r3, r2
+
+	SGE r5, r1, r3
+	beqz r3, #fpsBlocked
+
+	ldui r3, #2000
+	sub r3, r3, r2
+
+	SGE r5, r1, r3
+	beqz r5, #fpsBlocked						;draw if timer was currently reseted
+	*/
+
+	;Check if mouse moved	
+	load r1, r0, *d*mouse_x     
+	load r3, r0, *d*mouse_pos_x
+	sne r3, r1, r3
+	beqz r3, #fpsBlocked
+
+  	load r2, r0, *d*mouse_y
+	load r4, r0, *d*mouse_pos_y
+	sne r4, r2, r4
+	beqz r4, #fpsBlocked
+
+	/*
+	; if old_x and x, old_y and y are the same
+	seq r3, r3, r1
+	seq r4, r4, r2
+	
+	seq r3, r3, r4   					; if both are the same
+	seqi r5, r4, #1
+	seq r3, r3, r5   					; and if r4 is '1' 
+	bnez r3, #fpsBlocked
+	*/
+
+draw:
+	store r1, r5, *d*FPS_HANDLING		;store current timer value
+	store r1, r0, *d*mouse_pos_x
+  	store r2, r0, *d*mouse_pos_y
+	DEI
+	jal @ra, *removeOldCursor			; 1. remove cursor, and restore old image
+	jal @ra, *draw_handling				; 2. Paint
+	jal @ra, *drawCursor				; 3. Save data under cursor and Draw new cursor
+	ENI
+fpsBlocked:
+	@call ctx_restore
+	
+	jreg @ra
+@}
+
+
+@code clrScreen{
+	@CALL ctx_save				; save context
+
+	out  r0, #160				; reset address
+	ldui r1, #0x0000			; load background color - black
+
+	; init counter
+	ldui r3, #0x2580  ; r2 = 0x2580 = (640*480/32)
+	ldui r4, #20
+
+  ; fill screen
+fill:
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  out  r1, #162
+  dec  r4
+  beqz r4, #nline
+  jmp  #l2
+nline:
+  ldui r4, #20		;durchläufe je Zeile
+l2:
+  dec  r3
+  bnez r3, #fill
+
+  ; restore context & return
+  @CALL ctx_restore
+  jreg @ra
+@}
+
+
+
+@code updateFrame{
+	@call ctx_save
+
+	@ldef x 		"r1"		;Parameter x
+	@ldef y			"r2"		;Parameter y
+	@ldef gsa		"r3"		;GrafikSpeicherAdresse = x+640*y
+	@ldef color		"r4"		;Paramter color
+	@ldef t 		"r5"		;Zwischenspeicher
+
+   	LOAD @t, @NULL, *d*CURCOLOR		;load color
+	SHLI @color, @t, #4				;Shifting to write 4 pixel at onces
+	OR @color, @color, @t 				
+	SHLI @color, @color, #4
+	OR @color, @color, @t
+	SHLI @color, @color, #4
+	OR @color, @color, @t
+	
+	LDUI @y, #0					;upper frame line
+startHLine:
+	LDUI @x, #0					
+	@call getGSA @x @y @gsa		;getGSA for [0,0]
+	OUT @gsa, #160
+	LDUI @t, #320				;temp to 320 for fastbuffer write cycles
+hFrameLine:					
+	OUT @color, #162			
+	DEC @t
+	BNEZ @t, #hFrameLine
+
+	BNEZ @y, #go1				;stop after lower line drawing
+	LDUI @y, #478				;prepare for lower frame line
+	jmp #starthline
+go1:
+
+	LDUI @x, #0							;upper frame line
+	LDUI @y, #2		
+	LDUI @t, #476				;temp to 320 for fastbuffer write cycles		
+startvline:		
+	MOV @y, @color
+	@call getGSA @x @color @gsa			;getGSA
+	LOAD @color, @NULL, *d*CURCOLOR		;load color
+	OUT @gsa, #160			
+	OUT @color, #161
+	OUT @color, #161			
+	DEC @t
+	INC @y
+	BNEZ @t, #startvline
+
+	BNEZ @x, #go2				;stop after lower line drawing
+	LDUI @y, #2					;prepare for lower frame line
+	LDUI @x, #638
+	LDUI @t, #476	
+	jmp #startvline
+go2:
+
+	;return from Function
+    @call ctx_restore
+    jreg @ra
+@}
+

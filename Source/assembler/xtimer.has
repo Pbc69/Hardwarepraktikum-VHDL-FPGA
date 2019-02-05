@@ -1,0 +1,102 @@
+
+@def TimerStatus 	"#17"
+@def TimerTime 		"#16"
+
+
+@code start_timer {
+	;@code start_timer
+
+	@ldef t "r1"
+
+	ldui @t, #2000
+	out  @t, @TimerTime	;set time 2sec
+
+	;start timer
+	ldui @t, #101b 	; ohne interrupt
+	out  @t, @TimerStatus
+
+	;sisa #1, *timer_isr
+	jreg @ra
+@}
+
+
+
+@code bcd_switch_timer_check {
+	;@code bcd_switch_timer_check 
+
+	@ldef t "r1"
+
+	@call ctx_save
+	
+
+	; is expired?
+	ldui  @t, #4 
+	in    @t, @TimerStatus
+
+	andi  @t, @t, #4			
+	beqz  @t, #notexpired		; r1.hasFlag(IsExpired) == 0 ? notexpired
+
+	; Flip BCD x/y coord
+	load  r2, r0, *d*bcd_show_mousex
+	seq   r2, r2, r0						
+	bnez  r2, #mousey					; (bcd_show_mousex == 0) ? mousey
+	store r0, r0, *d*bcd_show_mousex	; bcd_show_mousex = 0
+	jmp   #timer
+
+mousey:
+	ldui  r1, #1
+	store r1, r0, *d*bcd_show_mousex	; bcd_show_mousex = 1
+
+timer:
+	; call start_timer
+	jal  @ra, *start_timer
+
+notexpired:
+	@call ctx_restore
+	jreg  @ra
+@}
+
+
+@code timer_wait {
+	@call ctx_save
+	
+	@ldef t "r1"
+
+notexpired:
+	ldui  @t, #4 
+	in    @t, @TimerStatus
+
+	andi  @t, @t, #4			
+	beqz  @t, #notexpired		; r1.hasFlag(IsExpired) == 0 ? notexpired
+
+	; call start_timer
+	jal  @ra, *start_timer
+	
+	@call ctx_restore
+	jreg  @ra
+@}
+
+/*
+@code timer_expired {
+	@ldef t "r1"
+	addi @sp, @sp, #1	; return value
+	@call ctx_save
+	
+
+	; is expired
+	ldui r1, #4 
+	in  r1, @TimerStatus
+
+	andi r1, r1, #4		;r1 = r1 & 4
+	;beqz r1, #ret
+
+;ret:
+
+	; If R1 == 4, Timer Expired,
+	; else R1 == 0
+	store r1, @sp, #-1
+
+	@call ctx_restore
+	jreq @ra
+@}
+*/

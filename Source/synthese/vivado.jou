@@ -1,0 +1,31 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Tue Jan 22 12:18:45 2019
+# Process ID: 1280
+# Current directory: C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent6048 C:\Hardware Praktikum\hadesXI_18\hadesXI_13\synthese\HaDes.xpr
+# Log file: C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese/vivado.log
+# Journal file: C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project -read_only {C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese/HaDes.xpr}
+update_compile_order -fileset sources_1
+save_project_as project_1 {C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese/project_1} -force
+launch_runs synth_1 -jobs 2
+wait_on_run synth_1
+launch_runs impl_1 -jobs 2
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 2
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/Hardware Praktikum/hadesXI_18/hadesXI_13/synthese/project_1/project_1.runs/impl_1/mcu.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]

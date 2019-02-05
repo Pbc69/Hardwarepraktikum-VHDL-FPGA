@@ -1,0 +1,61 @@
+                                                                                    ; special registers
+@DEF RA   "r6"
+@DEF SP   "r7"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; general helper                 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+@MAC ctx_save {
+	store r1, @sp, #0
+	store r2, @sp, #1
+	store r3, @sp, #2
+	store r4, @sp, #3
+	store r5, @sp, #4
+	store r6, @sp, #5
+	addi  @sp, @sp, #6
+@}
+
+@MAC ctx_restore {
+	subi  @sp, @sp, #6
+	load  r6, @sp, #5
+	load  r5, @sp, #4
+	load  r4, @sp, #3
+	load  r3, @sp, #2
+	load  r2, @sp, #1
+	load  r1, @sp, #0
+@}          
+
+@code main {
+	; save context
+	@CALL ctx_save
+
+	; run tests
+  ldi r1, #0x7c;
+  ldi r2, #0x7b;
+  ldi r3, #0x7a;
+  ldi r4, #0b0001; 
+
+	; restore context & return
+	@CALL ctx_restore
+	jreg  @ra
+@}
+
+@code __init {
+	; disable program-memory access
+	dpma
+
+	; disable interrupts
+	dei
+
+	; init stack-pointer
+	ldui @sp, #1
+	shli @sp, @sp, #16
+
+	; call main
+	jal @ra, *main
+
+	; done, just wait forever
+done:
+	jmp #done
+@}

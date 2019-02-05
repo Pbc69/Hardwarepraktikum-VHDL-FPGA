@@ -1,0 +1,9 @@
+
+*.log
+**.cf
+/*.cf
+/**.cf
+*.cf
+*.xpr
+*.hdb
+*.ho

@@ -1,0 +1,373 @@
+
+@data OLD_MOUSEX {#0 @}      ; old position for storage and recoverage of the old colors
+@data OLD_MOUSEY {#0 @}
+@data MOUSE_MOVED { #1 @}
+
+@data SAVEDXCOLORS {#0, #0, #0, #0, #0, #0, #0, #0 @}     ; Org. Colors of X Axis  
+@data SAVEDYCOLORS {#0, #0, #0, #0, #0, #0, #0, #0 @}     ; Org. Colors of Y Axis
+@def white "#0xF"
+
+@data r6buffer {#0 @}
+@data mouse_y_buffer{#0 @}
+
+; draw new cursor and store pixel-values
+@code drawCursor {
+
+
+    
+  @ldef x 		"r1"		; Parameter x
+  @ldef y		"r2"		  ; Parameter y           
+  @ldef gsa		"r3"		; GrafikSpeicherAdresse = x+640*y
+  @ldef pixCol "r4"   ; color of pixel / register for checks
+  @ldef storageCounter "r5"   ; counter to store pixel value in
+  @ldef counter "r6"  ; counter
+    
+  @call ctx_save
+
+	
+	load r1, r0, *d*MOUSE_MOVED
+	beqz r1, #exit
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
+; draw cursor x-part
+ 
+  ldui @counter, #0         ; initialize counter 
+  ldui @storageCounter, #0  ; initialize storage counter to 0 (first color in first place) 
+  load @x, r0, *d*mouse_x   ; load current mouse_x position
+  load @y, r0, *d*mouse_y   ; load current mouse_y position 
+  subi @x, @x, #5           ; go 5 to the left (draw cursor from left to right)
+
+drawXPixel:
+  ; check if the x value is too small or too large
+  ; if so: dont draw this pixel. 
+  slti r4, @x, #2
+  bnez r4, #continueX
+  sgti r4, @x, #637
+  bnez r4, #drawXFinished
+   
+  ; check if area is undrawed are in the middle of the cursor (if counter = 4|5|6)
+  seqi r4, @counter, #4
+  bnez r4, #continueX
+  seqi r4, @counter, #5
+  bnez r4, #continueX
+  seqi r4, @counter, #6
+  bnez r4, #continueX
+  
+  ; if all pixels are drawn (when counter = 11)
+  seqi r4, @counter, #11
+  bnez r4, #drawXFinished             ; stop drawing
+                
+  @call getGSA @x @y @gsa   ; calculate pixelnumber
+
+  ; get Pixelcolor
+  out @gsa, @VGAADR          		
+  in @pixCol, @VGACOLOR   
+  
+  ; store pixel value
+  store @pixCol, @storageCounter, *d*SAVEDXCOLORS
+  
+  ; load information to draw pixel (x and y are already. Need to store pixel color vlaue)
+  ; store pixel color in r3 - drawPixel needs it there
+  ldui @pixCol, @white  
+  
+  ; needs to be reloaded here every time, because value gets overrwritten by "getGSA"
+  load @y, r0, *d*mouse_y   ; load current mouse_y position 
+  
+  ; save r6, bevor overrideing r6 (@ra)
+  store r6, r0, *d*r6buffer
+  
+  ; increase @sp
+  addi @sp, @sp, #3
+  
+  ; store x, y, color values at correct positoin
+  store @x, @SP, #-1
+	store @y, @SP, #-2
+  store @pixCol , @SP, #-3
+  
+  ; draw white pixel at position
+  jal @ra, *drawPixel        
+
+  ; restore @sp to old position
+  subi @sp, @sp, #3
+  
+  ; load old r6 value
+  load r6, r0, *d*r6buffer
+
+  ; increase storage counter 
+  inc @storageCounter
+  
+continueX:
+  
+  ; increase counter and x position
+  inc @counter
+  inc @x
+  
+  jmp #drawXPixel            ; continue drawing pixel
+  
+drawXFinished:
+
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
+; draw cursor y-part
+
+  ldui @counter, #0         ; initialize counter 
+  ldui @storageCounter, #0  ; initialize storage counter to 0 (first color in first place) 
+  load @x, r0, *d*mouse_x   ; load current mouse_x position
+  load @y, r0, *d*mouse_y   ; load current mouse_y position 
+  subi @y, @y, #5           ; go 5 up (draw cursor from top down)
+
+drawYPixel:
+  ; check if the y value is too small or too large
+  ; if so: dont draw this pixel. 
+  slti r4, @y, #2
+  bnez r4, #continuey
+  sgti r4, @y, #477
+  bnez r4, #drawYFinished
+   
+  ; check if area is undrawed are in the middle of the cursor (if counter = 4|5|6)
+  seqi r4, @counter, #4
+  bnez r4, #continueY
+  seqi r4, @counter, #5
+  bnez r4, #continueY
+  seqi r4, @counter, #6
+  bnez r4, #continueY
+  
+  ; if all pixels are drawn (when counter = 11)
+  seqi r4, @counter, #11
+  bnez r4, #drawYFinished             ; stop drawing
+  
+  ; store current y-pos of mouse which is handled (gets overwritten by "getGSA")
+  store @y, r0, *d*mouse_y_buffer
+  
+  @call getGSA @x @y @gsa   ; calculate pixelnumber
+  
+  ; needs to be reloaded here every time, because value gets overrwritten by "getGSA"
+  load @y, r0, *d*mouse_y_buffer   ; load current mouse_y position 
+ 
+  ; get Pixelcolor
+  out @gsa, @VGAADR          		
+  in @pixCol, @VGACOLOR                                 
+  
+  ; store pixel value
+  store @pixCol, @storageCounter, *d*SAVEDYCOLORS
+
+  ; load information to draw pixel (x and y are already. Need to store pixel color vlaue)
+  ; store pixel color in r3 - drawPixel needs it there
+  ldui @pixCol, @white
+  
+  ; save r6, bevor overrideing r6 (@ra)
+  store r6, r0, *d*r6buffer
+  
+  ; increase @sp
+  addi @sp, @sp, #3
+  
+  store @x, @SP, #-1
+	store @y, @SP, #-2
+  store @pixCol , @SP, #-3
+  
+  ; draw white pixel at position
+  jal @ra, *drawPixel        
+
+  ; restore @sp to old position
+  subi @sp, @sp, #3
+  
+  ; load old r6 value
+  load r6, r0, *d*r6buffer
+
+  ; increase storage counter 
+  inc @storageCounter
+  
+continueY:
+  
+  ; increase counter and y position
+  inc @counter
+  inc @y
+  
+  jmp #drawYPixel            ; continue drawing pixel
+  
+drawYFinished:
+
+  ; set current mouse position to "old one"
+  load @x, r0, *d*mouse_x
+  load @y, r0, *d*mouse_y
+  
+  store @x, r0, *d*OLD_MOUSEX
+  store @y, r0, *d*OLD_MOUSEY
+
+exit:
+  @call ctx_restore
+  jreg @ra
+@}
+
+
+
+; load colors of pixel underneath the old cursor
+@code removeOldCursor {
+
+  @ldef x 		"r1"		; Parameter x
+  @ldef y		"r2"		  ; Parameter y           
+  @ldef gsa		"r3"		; GrafikSpeicherAdresse = x+640*y
+  @ldef pixCol "r4"   ; color of pixel / register for checks
+  @ldef storageCounter "r5"   ; counter to store pixel value in
+  @ldef counter "r6"  ; counter
+    
+  @call ctx_save
+
+  	load r1, r0, *d*mouse_x     
+	load r3, r0, *d*OLD_MOUSEX
+	sne r3, r1, r3
+	bnez r3, #draw
+
+  	load r2, r0, *d*mouse_y
+	load r4, r0, *d*OLD_MOUSEY
+	sne r4, r2, r4
+	beqz r4, #notDrawn
+draw:
+	ldui r1, #1
+	store r1, r0, *d*MOUSE_MOVED
+  
+  ; check if the cursor gut drawen at least once - if not so, skip restoring
+  ; test if OLD_MOUSEX/Y if 0 - if, so just draw new cursor and save new to old cursor
+  load r3, r0, *d*OLD_MOUSEX     
+  beqz r3, #drawYFinished           ; no old cursor to reset
+  
+  
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
+; delete cursor x-part
+ 
+  ldui @counter, #0         ; initialize counter 
+  ldui @storageCounter, #0  ; initialize storage counter to 0 (first color in first place) 
+  load @x, r0, *d*OLD_MOUSEX   ; load old mouse_x position
+  load @y, r0, *d*OLD_MOUSEY   ; load old mouse_y position 
+  subi @x, @x, #5           ; go 5 to the left (draw cursor from left to right)
+
+drawXPixel:
+  ; check if the x value is too small or too large
+  ; if so: dont draw this pixel. 
+  slti r4, @x, #2
+  bnez r4, #continueX
+  sgti r4, @x, #637
+  bnez r4, #drawXFinished
+   
+  ; check if area is undrawed are in the middle of the cursor (if counter = 4|5|6)
+  seqi r4, @counter, #4
+  bnez r4, #continueX
+  seqi r4, @counter, #5
+  bnez r4, #continueX
+  seqi r4, @counter, #6
+  bnez r4, #continueX
+  
+  ; if all pixels are drawn (when counter = 11)
+  seqi r4, @counter, #11
+  bnez r4, #drawXFinished             ; stop drawing
+  
+  load @pixCol, @storageCounter, *d*SAVEDXCOLORS
+  
+  ; save r6, bevor overrideing r6 (@ra)
+  store r6, r0, *d*r6buffer
+  
+  ; increase @sp
+  addi @sp, @sp, #3
+  
+  store @x, @SP, #-1                       
+	store @y, @SP, #-2
+  store @pixCol , @SP, #-3
+  
+  ; draw original pixel at position
+  jal @ra, *drawPixel        
+
+  ; restore @sp to old position
+  subi @sp, @sp, #3
+  
+  ; redraw pixel underneath the cursor
+  jal @ra, *drawPixel        
+
+  ; load old r6 value
+  load r6, r0, *d*r6buffer
+
+  ; increase storage counter 
+  inc @storageCounter
+  
+continueX:
+  
+  ; increase counter and x position
+  inc @counter
+  inc @x
+  
+  jmp #drawXPixel            ; continue drawing pixel
+  
+drawXFinished:
+
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
+; delete cursor y-part
+ 
+  ldui @counter, #0         ; initialize counter 
+  ldui @storageCounter, #0  ; initialize storage counter to 0 (first color in first place) 
+  load @x, r0, *d*OLD_MOUSEX   ; load old mouse_x position
+  load @y, r0, *d*OLD_MOUSEY   ; load old mouse_y position 
+  subi @y, @y, #5           ; go 5 up (draw cursor from top to bottom)
+
+drawYPixel:
+  ; check if the y value is too small or too large
+  ; if so: dont draw this pixel. 
+  slti r4, @y, #2
+  bnez r4, #continueY                         
+  sgti r4, @y, #477
+  bnez r4, #drawYFinished
+   
+  ; check if area is undrawed are in the middle of the cursor (if counter = 4|5|6)
+  seqi r4, @counter, #4
+  bnez r4, #continueY
+  seqi r4, @counter, #5
+  bnez r4, #continueY
+  seqi r4, @counter, #6
+  bnez r4, #continueY
+  
+  ; if all pixels are drawn (when counter = 11)
+  seqi r4, @counter, #11
+  bnez r4, #drawYFinished             ; stop drawing
+
+  load @pixCol, @storageCounter, *d*SAVEDYCOLORS    ; @@@@@@@@DEBUGGING
+
+  ; save r6, bevor overrideing r6 (@ra)
+  store r6, r0, *d*r6buffer
+  
+  ; increase @sp
+  addi @sp, @sp, #3
+  
+  store @x, @SP, #-1                       
+	store @y, @SP, #-2
+  store @pixCol , @SP, #-3
+  
+  ; draw original pixel at position
+  jal @ra, *drawPixel        
+
+  ; restore @sp to old position
+  subi @sp, @sp, #3
+  
+  ; load old r6 value
+  load r6, r0, *d*r6buffer
+
+  ; increase storage counter 
+  inc @storageCounter
+  
+continueY:
+  
+  ; increase counter and x position
+  inc @counter
+  inc @y
+  
+  jmp #drawYPixel            ; continue drawing pixel
+  
+drawYFinished:
+
+  @call ctx_restore
+  jreg @ra
+
+notDrawn:
+	ldui r1, #0
+	store r1, r0, *d*MOUSE_MOVED
+	jmp #drawYFinished
+@}

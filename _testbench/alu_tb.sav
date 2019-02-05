@@ -1,0 +1,42 @@
+[*]
+[*] GTKWave Analyzer v3.3.95 (w)1999-2018 BSI
+[*] Tue Dec 11 22:32:43 2018
+[*]
+[dumpfile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\alu_tb.ghw"
+[dumpfile_mtime] "Tue Dec 11 22:32:27 2018"
+[dumpfile_size] 19335
+[savefile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\alu_tb.sav"
+[timestart] 2555300000
+[size] 1920 1017
+[pos] -1929 -9
+*-25.063814 2710000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.alu_tb.
+[treeopen] top.alu_tb.uut.
+[sst_width] 211
+[signals_width] 253
+[sst_expanded] 1
+[sst_vpaned_height] 299
+@28
+top.alu_tb.clk
+top.alu_tb.reset
+@22
+#{top.alu_tb.opcode[4:0]} top.alu_tb.opcode[4] top.alu_tb.opcode[3] top.alu_tb.opcode[2] top.alu_tb.opcode[1] top.alu_tb.opcode[0]
+[color] 7
+#{top.alu_tb.result[31:0]} top.alu_tb.result[31] top.alu_tb.result[30] top.alu_tb.result[29] top.alu_tb.result[28] top.alu_tb.result[27] top.alu_tb.result[26] top.alu_tb.result[25] top.alu_tb.result[24] top.alu_tb.result[23] top.alu_tb.result[22] top.alu_tb.result[21] top.alu_tb.result[20] top.alu_tb.result[19] top.alu_tb.result[18] top.alu_tb.result[17] top.alu_tb.result[16] top.alu_tb.result[15] top.alu_tb.result[14] top.alu_tb.result[13] top.alu_tb.result[12] top.alu_tb.result[11] top.alu_tb.result[10] top.alu_tb.result[9] top.alu_tb.result[8] top.alu_tb.result[7] top.alu_tb.result[6] top.alu_tb.result[5] top.alu_tb.result[4] top.alu_tb.result[3] top.alu_tb.result[2] top.alu_tb.result[1] top.alu_tb.result[0]
+@28
+[color] 1
+top.alu_tb.regwrite
+[color] 3
+top.alu_tb.uut.overflow
+[color] 2
+top.alu_tb.uut.ov_mul
+top.alu_tb.uut.ov_addsub
+top.alu_tb.uut.ov_shift
+top.alu_tb.uut.store_ov
+top.alu_tb.uut.ovff
+@22
+#{top.alu_tb.uut.result[31:0]} top.alu_tb.uut.result[31] top.alu_tb.uut.result[30] top.alu_tb.uut.result[29] top.alu_tb.uut.result[28] top.alu_tb.uut.result[27] top.alu_tb.uut.result[26] top.alu_tb.uut.result[25] top.alu_tb.uut.result[24] top.alu_tb.uut.result[23] top.alu_tb.uut.result[22] top.alu_tb.uut.result[21] top.alu_tb.uut.result[20] top.alu_tb.uut.result[19] top.alu_tb.uut.result[18] top.alu_tb.uut.result[17] top.alu_tb.uut.result[16] top.alu_tb.uut.result[15] top.alu_tb.uut.result[14] top.alu_tb.uut.result[13] top.alu_tb.uut.result[12] top.alu_tb.uut.result[11] top.alu_tb.uut.result[10] top.alu_tb.uut.result[9] top.alu_tb.uut.result[8] top.alu_tb.uut.result[7] top.alu_tb.uut.result[6] top.alu_tb.uut.result[5] top.alu_tb.uut.result[4] top.alu_tb.uut.result[3] top.alu_tb.uut.result[2] top.alu_tb.uut.result[1] top.alu_tb.uut.result[0]
+#{top.alu_tb.uut.result_shift[31:0]} top.alu_tb.uut.result_shift[31] top.alu_tb.uut.result_shift[30] top.alu_tb.uut.result_shift[29] top.alu_tb.uut.result_shift[28] top.alu_tb.uut.result_shift[27] top.alu_tb.uut.result_shift[26] top.alu_tb.uut.result_shift[25] top.alu_tb.uut.result_shift[24] top.alu_tb.uut.result_shift[23] top.alu_tb.uut.result_shift[22] top.alu_tb.uut.result_shift[21] top.alu_tb.uut.result_shift[20] top.alu_tb.uut.result_shift[19] top.alu_tb.uut.result_shift[18] top.alu_tb.uut.result_shift[17] top.alu_tb.uut.result_shift[16] top.alu_tb.uut.result_shift[15] top.alu_tb.uut.result_shift[14] top.alu_tb.uut.result_shift[13] top.alu_tb.uut.result_shift[12] top.alu_tb.uut.result_shift[11] top.alu_tb.uut.result_shift[10] top.alu_tb.uut.result_shift[9] top.alu_tb.uut.result_shift[8] top.alu_tb.uut.result_shift[7] top.alu_tb.uut.result_shift[6] top.alu_tb.uut.result_shift[5] top.alu_tb.uut.result_shift[4] top.alu_tb.uut.result_shift[3] top.alu_tb.uut.result_shift[2] top.alu_tb.uut.result_shift[1] top.alu_tb.uut.result_shift[0]
+[pattern_trace] 1
+[pattern_trace] 0

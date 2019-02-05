@@ -1,0 +1,129 @@
+
+
+;1 = print X
+;else print Y
+@data bcd_show_mousex {#0 @}
+
+
+
+; Zeige x oder y auf BCD abhängig von *d*bcd_show_mousex
+@code mouse_coord2bcd {
+	;@code mouse_coord2bcd
+	@call ctx_save
+
+	@ldef t "r2"
+	
+
+	; if (bcd_show_mousex == 0) r1 = 1 
+	; else bcd_show_mousex = 0
+
+
+	load  @t, r0, *d*bcd_show_mousex
+	seq   @t, @t, r0						
+	bnez  @t, #mousey					; (bcd_show_mousex == 0) ? mousey
+	load  r1, r0, *d*mouse_x
+	subi r1, #2							; correction to logical mouse position
+	; R1 auf BCD ausgeben
+	jal @ra, *value2bcd
+	jmp #ret
+
+mousey:
+	load  r1, r0, *d*mouse_y
+	subi r1, #2							; correction to logical mouse position
+
+	jal @ra, *bin2bcd				; convert r1 to bcd
+	load r1, r0, *d*bcd_output
+
+	; Punkt hinzufügen
+	ldui r2, #0x1
+	shli r2, r2, #16
+	or r1, r1, r2
+    @call write2bcd r5 r1
+
+
+ret:
+  	@call ctx_restore
+  	jreg @ra
+@}
+
+
+
+@code mouse_printbcd_all {
+	; @code mouse_printbcd_all - save context
+  	@call ctx_save
+
+	@ldef buttons "r2"
+	@ldef x "r3"
+	@ldef y "r4"
+
+
+	; Lade Register
+	load @buttons, r0, *d*mouse_buttons
+	load @x, r0, *d*mouse_x
+	load @y, r0, *d*mouse_y
+
+
+	; Prüfe ob Buttons gedrückt
+	andi r1, @buttons, #1		; left button
+	andi r5, @buttons, #2		; right button
+	or r1, r5, r1
+
+	andi r5, @buttons, #4		; mid button
+	or r1, r5, r1
+								; r1 = r5
+	bnez r1, #printbcd			; wurde ein button gedrückt steht in R1 1 bis 7
+
+	; else print X
+	mov @x, r1		; r1 = x
+	; debuging test
+	; move @y, r1
+
+printbcd:
+
+	; R1 auf BCD ausgeben
+	jal @ra, *value2bcd
+
+ret:
+    ; restore context
+  	@call ctx_restore
+  	jreg @ra
+@}
+
+
+; Gib X & Y gekürzt auf BCD aus, code teils von basys_demo
+@code print_mouse_bcd {
+	;@code print_mouse_bcd 
+
+	@ldef x "r2"
+	@ldef y "r3"
+	@ldef xy "r4"
+
+
+	@call ctx_save
+
+	; Wandle X auf BCD um
+	load  r1, r0, *d*mouse_x		; r1 = mouseX
+	shri r1, r1, #2 				; r1 = r1 >> 2 (Abschneiden)
+	jal @ra, *bin2bcd     			; convert value in r1 to bcd  
+	load @x, r0, *d*bcd_output
+  
+    ; Wandle Y auf BCD um
+  	load  r1, r0, *d*mouse_y		; r1 = mouseY
+  	shri r1, r1, #2 				; r1 = r1 >> 2 (Abschneiden)
+	jal @ra, *bin2bcd     			; convert value in r1 to bcd  
+	load @y, r0, *d*bcd_output
+  
+
+	andi @x, @x, #0x00FF ; x = x & 0xFF => nur die ersten 8 bit 
+	andi @y, @y, #0x00FF ; y = y & 0xFF => nur die ersten 8 bit 
+
+	shli @x, @x, #8		 	; x = x << 8
+	or @xy, @y, @x  		; xy = x | y -->linke 2 7seg = x und rechte 2 7seg = y
+	
+	; aktiviere bcd
+	@call write2bcd r5 @xy
+
+  @call ctx_restore
+  jreg @ra
+@}
+

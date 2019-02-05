@@ -1,0 +1,164 @@
+@code ButtonPressed{
+	@call ctx_save				;save context
+
+	@ldef x "r3"
+	@ldef y "r4"
+
+	load @x, r0, *d*mouse_x
+	load @y, r0, *d*mouse_y
+
+	in r1, #66					;load button status
+	andi r2, r1, #0001b			;check NORTH button
+	BEQZ r2, #notNORTH
+		subi @y, @y, #0x4		
+
+notNORTH:
+
+	andi r2, r1, #0100b			;check SOUTH button
+	BEQZ r2, #notSOUTH
+		ADDI @y, @y, #0x4
+notSOUTH:
+
+	andi r2, r1, #1000b			;check WEST button
+	BEQZ r2, #notWEST
+		SUBI @x, @x, #0x4		
+notWEST:
+
+	andi r2, r1, #0010b			;check EAST button
+	BEQZ r2, #notEAST
+		ADDI @x, @x, #0x4	
+
+notEAST:
+	
+	store @x, @null, *d*mouse_x_next
+	store @y, @null, *d*mouse_y_next
+	;not needed anymore - jal @ra, *keep_mouse_in_rect
+
+	ldui r5, #0x0F				;Reset mask for interrupt/button-status bits
+	out r5, #66					;reset button status
+	shli r5, r5, #16			;shift to bits 19..16 
+	out r5, #68					;Write out the reset mask
+
+	; we handle all buttons, so clear all
+	ldui r5, #0xF
+
+
+  	@call ctx_restore
+	jreg @ra
+@}
+
+@code clearButtons{
+	@call ctx_save
+
+	ldui r5, #0x0F				;Reset mask for button/interrupt-status bits
+	out r5, #66					;clear button status
+	shli r5, r5, #16			;shift to bits 19..16 
+	out r5, #68					;Write out the reset mask
+	
+
+	@call ctx_restore
+	jreg @ra
+@}
+
+@code LoadColorChange{
+	@CALL ctx_save				;save context
+
+	in r1, #65					;load switch status
+	andi r1, r1, #0x000F		;masking to switch status only
+	store r1, @NULL, *d*CURCOLOR		
+	
+	IN r2, #64					;load LED Status
+	SHRI r3, r2, #16			;shift left to save blink status in r3
+	SHLI r3, r3, #16			;shift back to bits 31..16
+	ANDI r2, r2, #0xFFF0		;masking LED Status of SW3..0 only
+	OR r1, r1, r2				;combine non changeing bits with updated bits
+	OR r3, r3, r1				;combine upper and lower bits 
+	OUT r3, #64					;write out the updated status
+
+	LDUI r1, #0x0F				;Reset mask for interrupt-status bits
+	OUT r1, #68					;Write out the reset mask
+
+	jal @ra, *updateFrame
+
+  	@call ctx_restore
+	jreg @ra
+@}
+
+@code CheckBlockingChange{
+	; save context
+	@CALL ctx_save
+
+	IN r1, #65					;load switch status
+	ANDI r1, r1, #0x0010		;masking to switch status only
+	SHRI r2, r1, #4				;shift status bit to bit 0
+
+	Load r3, @NULL, *d*BLOCKED	;load old blocking Status
+	SGT r3, r3, r2				;check if blocking or unblocking
+	STORE r2, @NULL, *d*BLOCKED	;store blocking status
+
+	BEQZ r3, #notUnblocking
+		;Unblocking
+		jal @ra, *LoadColorChange		;lead/update current color from switches 
+		jal @ra, *clearButtons			;Clear button status if pressed while blocked
+		jal @ra, *mouse_clear_buffer	;
+	notUnblocking:
+
+
+	IN r4, #64					;load LED Status
+	SHRI r3, r4, #16			;shift left to save blink status in r3
+	;XORI r3, r2, #0x10			;set 
+	SHLI r3, r3, #16			;shift back to bits 31..16
+	ANDI r4, r4, #0xFFEF		;masking LED Status of SW4 only
+	OR r1, r1, r4				;combine non changeing bits with updated bits
+	OR r3, r3, r1				;combine upper and lower bits 
+	OUT r3, #64					;write out the updated status
+
+	LDUI r1, #0x10				;Reset mask for interrupt-status bits
+	OUT r1, #68					;Write out the reset mask
+
+	@call ctx_restore
+	jreg @ra
+@}
+
+@code busyWaitUnblock{
+
+	; @code busyWaitUnblock - save context
+	@CALL ctx_save
+
+;busyWait:
+	LOAD r1, @NULL, *d*BLOCKED	;store status
+	BEQZ r1, #notblocked
+busyWait:
+	IN r1, #65					;load switch status
+	ANDI r1, r1, #0x0010		;masking to switch status only
+	SHRI r2, r1, #4				;shift status bit to bit 0
+	STORE r2, @NULL, *d*BLOCKED	;store status
+	BNEZ r2, #busyWait			;busy waiting loop till Unblocked
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;	ReInit status!!
+	;;;;;;;;;;;;;;;;;;;;;;;;;
+	jal @ra, *LoadColorChange	;lead/update current color from switches 
+	jal @ra, *clearButtons		;Clear button status if pressed while blocked
+
+	;LDUI r1, #0xFFFF
+	;OUT r1, #129
+
+
+	;jal @ra, *ps2_init
+	; Init the PS2 for mouse
+	;jal @ra, *ps2_init_mouse
+	jal @ra, *mouse_clear_buffer
+
+
+	;; TODO 
+	;	- clear mouse position -> no jumping
+	;	- clear pressed buttons !!
+	;	- ...	
+	
+	
+notblocked:
+	ENI							;Enable Interupts
+	@call ctx_restore
+	jreg @ra
+@}

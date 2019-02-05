@@ -1,0 +1,141 @@
+
+
+; Global Variables
+@data bcd_output    {#0 @}
+
+
+; @1 = TempRegister
+; @2 = Anzuzeigender Wert (max 2 byte)
+@MAC write2bcd {
+	;@MAC write2bcd
+
+	ldui @1, #0x8000	; r5 = 0x8000
+	shli @1, @1, #16	; r5 = r5 << 16
+	or   @1, @1, @2		; r5 = r5 | xy
+	out  @1, #224	; schreibe BCD
+@}
+
+
+
+; Aktiviert BCD, R1 wird hier nicht gesichert!
+@code activate_bcd {
+	@call write2bcd r1 r0
+	;ldui r1, #0x8000		
+	;shli r1, r1, #16	; shift 32bits left to activate BCD
+	;out r1, #224
+	jreg @ra
+@}
+
+
+
+
+; Gib einen Wert von 0 bis 0xFFFF auf dem BCD aus
+; IN R1
+@code value2bcd {
+	;@code value2bcd 
+
+	@ldef param1 "r1"
+	@ldef value "r2"
+
+	@call ctx_save
+
+	;load  @param1, @SP, #-4		;	r1 = Parameter 1 vom stack
+
+	; Wandle Wert auf BCD um
+	jal  @ra, *bin2bcd     			; convert value in r1 to bcd  
+	load @value, r0, *d*bcd_output
+  
+
+	andi @value, @value, #0xFFFF ; x = x & 0xFFFF => nur die ersten 2 byte = 4x 7segment
+	
+	@call write2bcd r5 @value
+
+  	@call ctx_restore
+  	jreg @ra
+@}
+
+
+
+
+; bin2bcd - result into r2 - aus basys3_demo
+@code bin2bcd {
+
+  ; save context
+  @call ctx_save
+  
+  ; r1 binary value
+  ; r2 bcd result
+  ; r3 help variable
+  ; r4 help variable
+  ; r5 counter
+  ldui r2, #0
+  ldui r5, #16
+ 
+bin2bcd1:
+  andi r3, r2, #0x000F    ; check last digit
+  sgei r4, r3, #0x5       ; greater 5 --> add 3
+  bnez r4, #bin2bcdadd3
+  jmp #bin2bcddigit2
+
+bin2bcdadd3:
+  andi r2, r2, #0xFFF0
+  addi r3, r3, #0x3
+  andi r3, r3, #0x000F
+  or r2, r2, r3           ; add 3 in last digit 
+  
+bin2bcddigit2:
+  andi r3, r2, #0x00F0    ; check second digit
+  sgei r4, r3, #0x50      ; greater 5 --> add 3
+  bnez r4, #bin2bcdadd30
+  jmp #bin2bcddigit3
+  
+bin2bcdadd30:
+  andi r2, r2, #0xFF0F
+  addi r3, r3, #0x30
+  andi r3, r3, #0x00F0
+  or r2, r2, r3           ; add 3 << 4
+  
+bin2bcddigit3:
+  andi r3, r2, #0x0F00    ; check third digit
+  sgei r4, r3, #0x500     ; greater 5 --> add 3
+  bnez r4, #bin2bcdadd300
+  jmp #bin2bcddigit4
+  
+bin2bcdadd300:
+  andi r2, r2, #0xF0FF
+  addi r3, r3, #0x300
+  andi r3, r3, #0x0F00
+  or r2, r2, r3           ; add 3 << 8  
+  
+bin2bcddigit4:
+  andi r3, r2, #0xF000    ; check third digit
+  sgei r4, r3, #0x5000    ; greater 5 --> add 3
+  bnez r4, #bin2bcdadd3000
+  jmp #bin2bcd2
+  
+bin2bcdadd3000:
+  andi r2, r2, #0x0FFF
+  addi r3, r3, #0x3000
+  andi r3, r3, #0xF000
+  or r2, r2, r3           ; add 3 << 12
+ 
+bin2bcd2:
+  shli r2, r2, #1     ; shift everything one time to the left
+  dec r5              ; decrement counter down to zero
+  shr r4, r1, r5      ; shift 15 then 14 then 13 ...
+  andi r4, r4, #0x0001; only last bit
+  or r2, r2, r4       ; shift r1 into r2
+  
+bin2bcd3:
+  beqz r5, #bin2bcdexit ; exit if shifted 16 times
+  
+bin2bcd4:
+  jmp #bin2bcd1
+  
+bin2bcdexit:
+  ; restore context & return
+  store r2, r0, *d*bcd_output
+  
+  @call ctx_restore
+  jreg @ra
+@}

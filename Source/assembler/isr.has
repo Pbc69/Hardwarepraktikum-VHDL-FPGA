@@ -1,0 +1,63 @@
+
+@code xBus_isr{
+	DEI
+	; save context
+	@CALL ctx_save
+
+	IN r1, #68 					;load interrup-status register of xConsole
+	ANDI r2, r1, #0x0010		;masking to only block switch interrupt status
+	BEQZ r2, #NoBlockingChange	;jump if block status haven't changed
+		jal @ra, *CheckBlockingChange
+NoBlockingChange:	
+
+	LOAD r1, @NULL, *d*BLOCKED	;load blocking status
+	BNEZ r1, #blocked			;dont run ISRs if blocked
+
+	IN r1, #68 					;load interrup-status register of xConsole
+	ANDI r2, r1, #0xF			;masking to only color switch interrupt status
+	BEQZ r2, #NoColorChange		;jump if color hasn't changed
+		jal @ra, *LoadColorChange
+NoColorChange:
+
+	IN r1, #68 					;load interrup-status register of xConsole
+	SHRI r1, r1, #16			;Shift to show BUTTON interrupt status
+	ANDI r2, r1, #0xF			;masking to only button interrupt status
+	BEQZ r2, #NoButtonPressed	;jump if no button was pressed
+		jal @ra, *ButtonPressed
+NoButtonPressed:
+
+	;more interrupt handlings
+
+return:							;return from Function
+    @call ctx_restore
+	ENI							
+	RETI
+
+blocked:						
+		LDUI r1, #0xFFFF		;interrupt status mask
+		out r1, #68				;reset interruot status
+	jmp #return
+
+@}
+
+
+@code initISRs{
+	@CALL ctx_save
+	
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;  Init Switch and Button interrupts
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ldui r1, #000000000001111b ; enable Button interrupt for north, east, south, west
+  	shli r1, r1, #16
+  	ori r1, #0000000000011111b	; enable Switch interrapts sw5..0
+  	out  r1, #67
+
+	; enable mouse interrupt
+	;ldui r1, #1
+  	;out  r1, #130
+
+	SISA #1, *xBus_isr
+
+	@call ctx_restore
+	jreg @ra
+@}

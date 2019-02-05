@@ -1,0 +1,75 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global Defs!                                                               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Register.
+@def NULL "r0"            ; Nullregister.
+@DEF RA   "r6"
+@DEF SP   "r7"
+
+; Portadressen.
+@def VGAADR 		"#160"	; Adressport des Bildschirms.
+@def VGACOLOR 		"#161"	; Datenport des Bildschirms.
+
+@data CURCOLOR 	{ #0 @}
+@data BLOCKED 	{ #0 @}
+	
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; helper functions               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+@MAC ctx_save {
+	store r1, @sp, #0
+	store r2, @sp, #1
+	store r3, @sp, #2
+	store r4, @sp, #3
+	store r5, @sp, #4
+	store r6, @sp, #5
+	addi  @sp, @sp, #6
+@}
+
+@MAC ctx_restore {
+	subi  @sp, @sp, #6
+	load  r6, @sp, #5
+	load  r5, @sp, #4
+	load  r4, @sp, #3
+	load  r3, @sp, #2
+	load  r2, @sp, #1
+	load  r1, @sp, #0
+@}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic Initalization            ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+@code ps2_init {
+	; reset controller
+	ldui  r1, #0x20
+	out   r1, #129
+
+	; wait until initialized
+wait:
+	in    r1, #129
+	andi  r1, #0x04
+	beqz  r1, #wait
+
+	; done
+	jreg @ra
+@}
+
+@code ps2_init_mouse {
+	; write mouse-init-byte
+	ldui r1, #0xF4
+	out  r1, #128
+	
+	; receive ack
+wait:
+	in    r1, #129
+	andi  r1, #0x01
+	beqz  r1, #wait
+	in    r1, #128
+
+	; done
+	jreg @ra
+@}

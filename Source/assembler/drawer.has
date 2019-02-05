@@ -1,0 +1,163 @@
+@data draw_mouse_x_last 	{#0 @}
+@data draw_mouse_y_last 	{#0 @}
+@data can_clear_screen {#1 @}
+
+; do action by mouse buttons
+@code draw_handling {
+	;@code draw_handling
+	@call ctx_save
+
+	@ldef buttons "r2"
+
+	load @buttons, r0, *d*mouse_buttons
+
+	;debug always draw
+	;jmp #drawline
+
+	; Prüfe ob Buttons gedrückt
+	andi r1, @buttons, #1		; left button
+	bnez r1, #drawline
+
+	andi r1, @buttons, #2		; right button
+	bnez r1, #rubber
+
+	; no draw button pressed, reset last mouse position
+	store  r0, r0, *d*draw_mouse_x_last
+    store  r0, r0, *d*draw_mouse_y_last 
+
+	andi r1, @buttons, #4		; mid button
+	bnez r1, #clearscreen
+
+	;Mid nicht gedrückt > allow clear screen
+	ldui   r1, #1
+	store  r1, r0, *d*can_clear_screen 
+
+	jmp #ret
+
+drawline:
+	jal @ra, *draw
+	jmp #ret
+
+clearscreen:
+	load  r1, r0, *d*can_clear_screen 
+	beqz r1, #ret						; can_clear_screen = 0 ? ret
+
+	store  r0, r0, *d*can_clear_screen  ;can_clear_screen = 0
+
+	jal @ra, *clrScreen
+	jal @ra, *updateFrame
+	
+	; redraw cursor
+	ldui r1, #1
+	store r1, r0, *d*MOUSE_MOVED
+	jmp #ret
+
+rubber:
+	jal @ra, *rubber
+
+ret:
+	@call ctx_restore
+	jreg @ra
+@}
+
+@code draw {
+	;@code draw 
+	@call ctx_save
+
+	jal @ra, *draw_init
+
+	@ldef x1 "r1"
+	@ldef y1 "r2"
+	@ldef x2 "r3"
+	@ldef y2 "r4"
+	@ldef color "r5"
+	@ldef t  "r5"
+
+
+  	load  @x1, r0, *d*mouse_x
+    load  @y1, r0, *d*mouse_y
+	load  @x2, r0, *d*draw_mouse_x_last
+    load  @y2, r0, *d*draw_mouse_y_last
+
+	; nutze drawline nur bei movement
+	sne  @t, @x1, @x2		
+	bnez @t, #drawline		; x1 != x2 ? draw
+
+	sne  @t, @y1, @y2		
+	bnez @t, #drawline		; y1 != y2 ? draw
+
+	; zeichne pixel - maus nicht bewegt
+	addi   @sp, @sp, #3
+	store  @x1, @sp, #-1			;x
+	store  @y1, @sp, #-2			;y
+	load   @color, r0, *d*CURCOLOR
+	store  @color, @sp, #-3			;color
+	jal    @ra, *drawPixel
+	subi   @sp, #3
+	jmp    #ret
+
+drawline:
+	store  @x1, r0, *d*draw_mouse_x_last
+    store  @y1, r0, *d*draw_mouse_y_last 
+
+	load   @color, r0, *d*CURCOLOR
+
+	addi   @sp, @sp, #5
+	store  @x1, @sp, #-1
+	store  @y1, @sp, #-2
+	store  @x2, @sp, #-3
+	store  @y2, @sp, #-4
+	store  @color, @sp, #-5
+
+	; CALL drawLine
+	jal  @ra, *drawLine
+	subi @sp, @sp, #5
+
+ret:
+	@call ctx_restore
+	jreg  @ra
+@}
+
+; Setze Letzte Mauspoisition, wenn noch nicht gesetzt wurde
+@code draw_init {
+	;@code draw_init 
+	@call ctx_save
+
+	load  r1, r0, *d*draw_mouse_x_last
+	bnez  r1, #isInitialized					; (mouse_x_last == 0) != 0 ? isInitialized
+
+	; init
+  	load  r1, r0, *d*mouse_x
+	store r1, r0, *d*draw_mouse_x_last
+    load  r1, r0, *d*mouse_y
+	store r1, r0, *d*draw_mouse_y_last
+
+isInitialized:
+	@call ctx_restore
+	jreg @ra
+@}
+
+
+; Problem, wenn sich CURCOLOR während dem Vorgang ändert
+; TODO, rubber Breite muss größer sein, evtl geht bei drawline auch eine Breite, sonst müsste man
+; mehrere drawlines zeichnen
+@code rubber {
+	;@code draw_init 
+	@call ctx_save
+
+	; set CURCOLOR = black
+	load  r1, r0, *d*CURCOLOR		; r1 = CURCOLOR
+	store r0, r0, *d*CURCOLOR		; CURCOLOR = black (0)
+
+	;call draw
+	jal  @ra, *draw
+
+	; reset CURCOLOR
+	store  r1, r0, *d*CURCOLOR		;CURCOLOR = r1
+
+ret:
+	@call ctx_restore
+	jreg @ra
+@}
+
+

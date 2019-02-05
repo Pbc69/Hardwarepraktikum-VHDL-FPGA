@@ -1,0 +1,319 @@
+
+; MouseEvent
+@data mouse_ctr    {#100 @}			; Index MouseData
+@data mouse_data   {#1, #2, #3 @}	; 3bytes vom Maus Output - Info/x/y
+@data mouse_x      {#320 @}			; X Absolut
+@data mouse_y      {#240 @}			; Y Absolut
+@data mouse_x_next      {#0 @}			; X Absolut
+@data mouse_y_next      {#0 @}			; Y Absolut
+@data mouse_buttons      {#1337 @}	; 3 bits: 1bit=left, 2,=right, 3.=mid
+@data mouse_sensitivity 	{#2 @}	; <unused>
+
+
+; Mouse Rectangle
+;@data MLeft 	{#0 @}
+;@data MTop 		{#0 @}
+;@data MRight 	{#640 @} 
+;@data MBottom 	{#480 @}
+
+; Mouse Rectangle als Konstante
+@def cMLeft 	"#2"
+@def cMTop 		"#2"
+@def cMRight 	"#638"
+@def cMBottom 	"#478"
+
+
+@def ps2_data 		"#128"
+@def ps2_status 	"#129"
+@def ps2_control 	"#130"
+
+
+
+@code mouse_clearvars {
+	; @code mouse_clearvars
+	@call ctx_save
+
+	
+	store r0, r0, *d*mouse_ctr
+	store r0, r0, *d*mouse_buttons
+
+	; restore context & return
+	@call ctx_restore
+	jreg @ra
+@}
+
+
+; In interrupt routine. Diese muss aufgerufen werden, wenn die Maus ein interrupt auslöst
+@code mouse_isr {
+	@call ctx_save
+
+	jal @ra, *read_mouse
+
+	; reset mouse 
+  	;ldui r1, #0xF4
+  	;out  r1, @ps2_control		; xbus[ps2_control] = 0xF4
+
+  	reti
+
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+
+
+; Lese von PS2 solange bis Buffer leer ist => Maus-Daten geleert
+@code mouse_clear_buffer {
+  ; @code read_mouse - save context
+  @call ctx_save
+
+read:
+	in    r1, @ps2_status		; r1 = xbus[ps2_status]
+	andi  r1, #1				; Bit 1 : In receive buffer full
+  	beqz  r1, #empty			; (r1.HasFlag(1) == 0) goto #empty
+
+	; read buffer
+	in    r5, @ps2_data			; r5 = xbus[ps2_data]
+
+	; check for more data
+	jmp #read
+
+empty:
+
+  jal @ra, *mouse_clearvars
+
+  ; restore context & return
+  @call ctx_restore
+  jreg  @ra
+@}
+
+
+; Prüfe ob neue MausDaten vorhanden und speichere diese ab
+@code read_mouse {
+  ; @code read_mouse - save context
+  @call ctx_save
+
+	; is there a new mouseposition from interrupt
+	load r1, r0, *d*mouse_x_next;
+	beqz r1, #read
+
+	store r1, r0,  *d*mouse_x;
+	load  r1, r0, *d*mouse_y_next;
+	store r1, r0,  *d*mouse_y;
+	; clear 
+	store r0, r0,  *d*mouse_x_next;
+	store r0, r0,  *d*mouse_y_next;
+
+read:
+	in    r1, @ps2_status		; r1 = xbus[ps2_status]
+	andi  r1, #1				; Bit 1 : In receive buffer full
+  	beqz  r1, #empty			; (r1.HasFlag(1) == 0) goto #empty
+
+	; call mouse_rxbyte
+	jal   @ra, *mouse_rxbyte
+
+	; check for more data
+	jmp #read
+
+empty:
+
+  ; restore context & return
+  @call ctx_restore
+  jreg  @ra
+@}
+
+
+; ---------------- @code mouse_rxbyte --------------------------------------------------------
+; Liest pro Aufruf 1 Byte aus PS2_Data Buffer und zählt mit wie oft es gelesen hat.
+; Nach 3x wird der Counter zurückgesetzt und die gelesenen 3 Bytes in mouse_parse() behandelt
+;---------------------------------------------------------------------------------------------
+@code mouse_rxbyte {
+  ; @code mouse_rxbyte - save context
+  @call ctx_save
+
+  ; load byte-counter
+  load  r4, r0, *d*mouse_ctr 	; r4 = mouseCtr (4byte)
+
+  ; receive byte
+  in    r5, @ps2_data			; r5 = xbus[ps2_data]
+  
+  ; store byte into buffer
+  store r5, r4, *d*mouse_data	; (mouseCtr + mousedata) = r5
+
+  ; update byte-counter
+  inc   r4						; r4++
+  sgei  r3,r4,#3				; r4 >= 3 ? 1 : 0
+  beqz  r3, #next				; (r4 < 3)
+
+
+  ; alle 3 bytes eingelesen, nun behandle das event
+  ; call mouse_parse
+  jal   @ra, *mouse_parse
+
+  ; reset byte-counter
+  ldui  r4, #0					; r4 = 0
+
+next:
+  ; save byte-counter
+  store r4, r0, *d*mouse_ctr	; mousedata = r4
+
+  ; restore context
+  @call ctx_restore
+  jreg  @ra
+@}
+
+
+
+@code mouse_parse {
+  ; @code mouse_parse - save context
+  @call ctx_save
+
+  @ldef md2 "r2"
+  @ldef info 	"r3"
+  @ldef x 		"r4"
+  @ldef y 		"r5"
+
+  ; read frame from buffer
+  ldui 	r5, *d*mouse_data
+  load	@info, r5, #0		; byte 1
+  load 	@x, r5, #1			; x offset
+  load 	@y, r5, #2			; y offset
+
+
+  ; save mousebuttons
+  andi 	r1, @info, #0b111		
+  store r1, r0, *d*mouse_buttons	; r1 = info & 111b
+
+  ; sign-expand x-offset if required
+  andi  r1, @info, #0x10	; r1 = r3.hasFlag(0x10)
+  beqz  r1, #x_positive		; nein? dann positiv
+  ldi   r1, #0xFF00			; r1 = 0xFF00
+  or    @x, @x, r1			; r4 = r4 | 0xFF00
+
+x_positive:
+
+  ; sign-expand y-offset if required
+  andi  r1, @info, #0x20
+  beqz  r1, #y_positive
+  ldi   r1, #0xFF00
+  or    @y, @y, r1
+
+y_positive:
+
+
+  ; use mouse sensitivity, leider falscher platz hier, so zeichnet drawline immer 2 pixel
+  ;load  r1, r0, *d*mouse_sensitivity
+  ;mul  @x, @x, r1	
+  ;mul  @y, @y, r1	
+
+  ; update x-position
+  load  r1, r0, *d*mouse_x		; r1 = mouse_x
+  add   @x, @x, r1				; x = x + r1 (x = 5 + 320)
+  store @x, r0, *d*mouse_x		; mouse_x = x
+
+  ; update y-position
+  load  r2, r0, *d*mouse_y
+  muli  @y, @y, #-1				; invert y-coordinate (maybe faster with xor 0x8000) y = -y	
+  add   @y, @y, r2				; y = y+r2 (y= -5 + 240)
+  store @y, r0, *d*mouse_y
+
+
+  ; check bounds
+  jal   @ra, *keep_mouse_in_rect
+
+
+  ; restore context
+  @call ctx_restore
+  jreg @ra
+@}
+
+
+
+@code keep_mouse_in_rect {
+	;@code keep_mouse_in_rect 
+	@ldef x 	"r1"
+   	@ldef y 	"r2"
+   	@ldef t		"r3"
+   
+    @call ctx_save
+
+	; R1 und R2 beinhalten x & y
+	load  @x, r0, *d*mouse_x	; r1 = mouse_x
+	load  @y, r0, *d*mouse_y	; r1 = mouse_x
+	
+
+	sgei  @t, @x, @cMLeft		; x >= LEFT ? 1 : 0
+	bnez  @t, #top				; x < left 
+	addi  @x, r0, @cMLeft		; x = LEFT
+
+top:
+	sgei  @t, @y, @cMTop
+	bnez  @t, #right
+	addi  @y, r0, @cMTop
+
+right:
+	slti  @t, @x, @cMRight
+	bnez  @t, #bottom
+	addi  @x, r0, @cMRight
+	subi  @x, @x, #1
+
+bottom:
+	slti  @t, @y, @cMBottom
+	bnez  @t, #ret
+	addi  @y, r0, @cMBottom
+	subi  @y, @y, #1
+
+ret:
+
+  	store @x, r0, *d*mouse_x		; mouse_x = x
+  	store @y, r0, *d*mouse_y
+
+	@call ctx_restore
+ 	jreg @ra
+@}
+
+
+
+
+/*
+@code ps2_init {
+  ; reset controller
+  ldui  r1, #0x20
+  out   r1, #129
+
+  ; wait until initialized
+wait:
+  in    r1, #129
+  andi  r1, #4	; device initialized
+  beqz  r1, #wait
+
+  ; done
+  jreg @ra
+@}
+
+
+
+; hier wird solange gewartet bis die Maus bereit ist
+@code ps2_init_mouse {
+  ; write mouse-init-byte
+  ldui r1, #0xF4
+  out  r1, @ps2_data		; xbus[ps2_data] = 0xF4
+  
+  ; receive ack
+wait:
+  in    r1, #129	; lese PS2 status
+  andi  r1, #1		; prüfe ob mouse was irgendwas gesendet hat
+  beqz  r1, #wait	; wenn nicht, dann prüfe erneut
+
+  in    r1, #128	; lese PS2 daten (8Bits)
+
+
+  ; mouse found => enable IRQ
+  ; TODO, uncomment this if interrupt routine is handling mouse interrupts
+  ;ldui r1, #1
+  ;out  r1, #130
+
+
+  ; done
+  jreg @ra
+@}
+*/

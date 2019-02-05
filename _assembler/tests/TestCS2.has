@@ -1,0 +1,56 @@
+@data muster {
+#008h
+@}
+
+@code __init {
+
+@ldef counter "r3"
+@ldef muster "r4"
+
+LDUI @counter, #2
+SHLI @counter, @counter, #17
+ADDI @counter, @counter, #5800 ; Init. Pixelz¨ahler mit 307200/2
+ADD @counter, @counter, @counter
+
+LOAD @muster, r0, *d*muster ; Muster laden
+loop:
+
+OUT @counter, #160 ; Schreiben des Pixels...
+OUT @muster, #161 ; ...auf den Datenport
+
+DEC @counter ; Z¨ahler erniedrigen
+BNEZ @counter, #loop ; Falls noch nicht fertig, neu ausgeben
+
+LDUI @counter, #1278
+ldui @muster, #FFFh
+loop2:
+out @counter, #160
+out @muster, #161
+
+dec @counter
+bnez @counter, #loop2
+
+LDUI @counter, #2
+SHLI @counter, @counter, #17
+ADDI @counter, @counter, #5800 ; Init. Pixelz¨ahler mit 307200/2
+ADD @counter, @counter, @counter
+
+ldui @counter, #639
+ldui @counter, #479
+MUL @counter, @counter, r6
+ldui @muster, #FFFh
+
+loop3:
+out @counter, #160
+out @muster, #161
+
+dec @counter
+ldui r5, #635
+ldui r6, #475
+MUL r5, r5, r6
+sgt r5, r5, @counter 
+beqz r5, #loop3
+
+endlos:
+JMP #endlos ; Endlosschleife, sobald Bildschirm gef¨ullt
+@}

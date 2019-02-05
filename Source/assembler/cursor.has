@@ -1,0 +1,455 @@
+
+
+
+@data cursor_x_last 	{#0 @}
+@data cursor_y_last 	{#0 @}
+
+@data cursor_draw_color {#1234 @}
+@data cursor_x_color_last {#6 @}
+@data cursor_y_color_last {#7 @}
+
+
+@MAC cursor_read_pixel {
+	addi   @sp, #3
+	store  @1, @sp, #-1			;x
+	store  @2, @sp, #-2			;y
+	jal @ra, *read_pixel
+	load  @3, @sp, #-3			; return value color
+	subi  @sp, #3
+@}
+
+@MAC cursor_draw_pixel {
+	addi   @sp, #3
+	store  @1, @sp, #-1			;x
+	store  @2, @sp, #-2			;y
+	store  @3, @sp, #-3			;color
+	jal @ra, *drawPixel
+	subi   @sp, #3
+@}
+
+; Wenn screen gecleart wird, muss cursor neu initalisiert werden
+
+; Setze Letzte Mauspoisition, wenn noch nicht gesetzt wurde
+@code cursor_init {
+	;@code cursor_init 
+	@call ctx_save
+
+	load  r1, r0, *d*cursor_x_last
+	bnez  r1, #isInitialized
+
+	; load cursor color
+	ldui  r1, #0xC9BF	; hellblau weis weis weis
+	ldui  r2, #0xFB9C 	; weis weis weis hellblau
+	shli  r1, r1, #16
+	or    r1, r1, r2
+	store r1, r0, *d*cursor_draw_color
+
+	jal   @ra, *cursor_savecolor
+
+isInitialized:
+	@call ctx_restore
+	jreg @ra
+@}
+
+
+
+@code cursor_draw {
+	; @code cursor_draw 
+	@call ctx_save
+
+	jal @ra, *cursor_init
+
+
+	@ldef x1 "r1"
+	@ldef x2 "r2"
+	@ldef y1 "r3"
+	@ldef y2 "r4"
+	@ldef t  "r5"
+
+	load  @x1, r0, *d*cursor_x_last
+    load  @y1, r0, *d*cursor_y_last
+	load  @x2, r0, *d*mouse_x
+    load  @y2, r0, *d*mouse_y
+
+	; zeichnet nur wenn die maus posi sich geändert hat
+	sne  @t, @x1, @x2		
+	bnez @t, #paint		; x1 != x2 ? draw
+
+	sne  @t, @y1, @y2		
+	bnez @t, #paint		; y1 != y2 ? draw
+	jmp  #ret
+
+paint:
+	; mouse moved > do cursor job
+	;jal @ra, *cursor_restorecolor
+	jal @ra, *cursor_savecolor
+	jal @ra, *cursor_paint
+
+
+	; update last position
+	load   @t, r0, *d*mouse_x
+	store  @t, r0, *d*cursor_x_last
+	load   @t, r0, *d*mouse_y
+	store  @t, r0, *d*cursor_y_last
+
+ret:
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+@code cursor_remove {
+	; @code cursor_remove 
+	@call ctx_save
+
+	jal @ra, *cursor_init
+
+
+	@ldef x1 "r1"
+	@ldef x2 "r2"
+	@ldef y1 "r3"
+	@ldef y2 "r4"
+	@ldef t  "r5"
+
+	load  @x1, r0, *d*cursor_x_last
+    load  @y1, r0, *d*cursor_y_last
+	load  @x2, r0, *d*mouse_x
+    load  @y2, r0, *d*mouse_y
+
+	; zeichnet nur wenn die maus posi sich geändert hat
+	sne  @t, @x1, @x2		
+	bnez @t, #paint		; x1 != x2 ? draw
+
+	sne  @t, @y1, @y2		
+	bnez @t, #paint		; y1 != y2 ? draw
+	jmp  #ret
+
+paint:
+	; mouse moved > do cursor job
+	jal @ra, *cursor_restorecolor
+
+
+ret:
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+@code cursor_paint {
+	; @code cursor_paint 
+	@call ctx_save
+	@ldef t "r1"
+
+	; print X
+	addi   @sp, #3
+	load   @t, r0, *d*mouse_x
+	store  @t, @sp, #-1			;x
+	load   @t, r0, *d*mouse_y
+	store  @t, @sp, #-2			;y
+	load   @t, r0, *d*cursor_draw_color		;0x1111 2222
+	store  @t, @sp, #-3	;color
+
+    ;@call print_x
+	jal    @ra, *cursor_print_x
+	subi   @sp, #3
+
+	; print  Y
+	addi   @sp, #3
+	load   @t, r0, *d*mouse_x
+	store  @t, @sp, #-1			;x
+	load   @t, r0, *d*mouse_y
+	store  @t, @sp, #-2			;y
+	load   @t, r0, *d*cursor_draw_color		;0x1111 2222
+	store  @t, @sp, #-3	;color
+
+	;@call print_y
+	jal   @ra, *cursor_print_y
+	subi  @sp, #3
+
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+@code cursor_restorecolor {
+	; @code cursor_restorecolor 
+	@call ctx_save
+
+
+	@ldef t "r1"
+
+	; is initialized?
+	load  @t, r0, *d*cursor_x_last
+	beqz  @t, #ret
+ 
+
+
+	; print old X  - pass parameters
+	addi   @sp, #3
+	load   @t, r0, *d*cursor_x_last
+	store  @t, @sp, #-1			;x
+	load   @t, r0, *d*cursor_y_last
+	store  @t, @sp, #-2			;y
+	load   @t, r0, *d*cursor_x_color_last
+	store  @t, @sp, #-3	;color
+
+    ;@call print_x
+	jal    @ra, *cursor_print_x
+	subi   @sp, #3
+
+
+	; print old X - pass parameters
+	addi   @sp, #3
+	load   @t, r0, *d*cursor_x_last
+	store  @t, @sp, #-1			;x
+	load   @t, r0, *d*cursor_y_last
+	store  @t, @sp, #-2			;y
+	load   @t, r0, *d*cursor_y_color_last
+	store  @t, @sp, #-3	;color
+
+    ;@call print_x
+	jal    @ra, *cursor_print_y
+	subi   @sp, #3
+
+ret:
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+; Save colors of next cursor position
+@code cursor_savecolor {
+	; @code cursor_savecolor 
+	@call ctx_save
+
+	@ldef t "r1"
+
+	addi   @sp, #2
+	load   @t, r0, *d*mouse_x
+	store  @t, @sp, #-1
+	load   @t, r0, *d*mouse_y
+	store  @t, @sp, #-2
+
+	jal   @ra, *cursor_read_x
+	jal   @ra, *cursor_read_y
+	subi   @sp, #2
+
+	;@cursor_savecolor finish
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+
+; Print line from left to right
+; @IN SP-1 = x
+;		-2 = y
+;		-3 = color
+@code cursor_print_x {
+	; @code cursor_print_X_new
+	@call ctx_save
+
+
+	@ldef x 	"r1"
+	@ldef y 	"r2"
+	@ldef allcolor "r3"				; 0x2222 2222
+	@ldef color "r4"
+
+	load  @x, 			@sp, #-7	;x
+	load  @y, 			@sp, #-8	;y
+	load  @allcolor, 	@sp, #-9	;colors
+
+	; print line x+7 to x
+	; x-start position x+7 - print right line
+	addi  @x, @x, #6
+
+	ldui r5, #8
+loop:
+	subi  @x, @x, #1
+	andi  @color, @allcolor, #0xF			;0x0000 00003 = 
+	shri  @allcolor, #4
+	@call cursor_draw_pixel @x @y @color
+	dec  r5
+	beqz r5, #ret
+
+	seqi  r6, r5, #4			; did we print 4 times?
+	beqz  r6, #loop	
+
+	; jump over cursor center
+	subi  @x, @x, #3
+	ldui  r5, #4		; restart
+	jmp #loop
+
+ret:
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+; Print line from left to right
+; @IN SP-1 = x
+;		-2 = y
+;		-3 = color
+@code cursor_print_y {
+	; @code cursor_print_y_new
+	@call ctx_save
+
+	@ldef x 	"r1"
+	@ldef y 	"r2"
+	@ldef allcolor "r3"				; 0x2222 2222
+	@ldef color "r4"
+
+	load  @x, 			@sp, #-7
+	load  @y, 			@sp, #-8
+	load  @allcolor, 	@sp, #-9
+
+	; print line y+5 to y+2 and y-2 to y-5
+	; y-start position y+6
+	addi  @y, @y, #6
+
+	ldui r5, #8
+loop:
+	subi  @y, @y, #1
+	andi  @color, @allcolor, #0xF
+	shri  @allcolor, #4
+	@call cursor_draw_pixel @x @y @color
+	dec  r5
+	beqz r5, #ret
+
+	seqi  r6, r5, #4			; did we print 4 times?
+	beqz  r6, #loop	
+
+	; jump over cursor center
+	subi  @y, @y, #3		; y = y+2 - 3  => y-1
+	ldui  r5, #4		; restart
+	jmp #loop
+
+ret:
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+
+
+
+@code cursor_read_x {
+	; @code cursor_read_x
+	@call ctx_save
+
+
+	@ldef x 	"r1"
+	@ldef y 	"r2"		
+	@ldef allcolor "r3"	
+	@ldef color "r4"
+
+	load  @x, 			@sp, #-7	;x
+	load  @y, 			@sp, #-8	;y
+
+	; print line x+6 to x
+	; x-start position x+6 - print right line
+	subi  @x, @x, #6
+
+	mov r0, @allcolor 
+	ldui r5, #8
+loop:
+	addi  @x, @x, #1
+	shli  @allcolor, #4
+	@call cursor_read_pixel @x @y @color
+	or @allcolor, @allcolor,  @color			; 0x2000 | 0x4 => 0x2004
+	
+	dec  r5
+	beqz r5, #ret
+
+	seqi  r6, r5, #4			; did we print 4 times?
+	beqz  r6, #loop	
+
+	; jump over cursor center
+	addi  @x, @x, #3
+	ldui  r5, #4		; restart
+	jmp #loop
+
+ret:
+	store @allcolor, r0, *d*cursor_x_color_last
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+
+@code cursor_read_y {
+	; @code cursor_read_y_new
+	@call ctx_save
+
+
+	@ldef x 	"r1"
+	@ldef y 	"r2"
+	@ldef allcolor "r3"	
+	@ldef color "r4"
+
+	load  @x, 			@sp, #-7
+	load  @y, 			@sp, #-8
+
+	; print line x+7 to x
+	; x-start position x+7 - print right line
+	subi  @y, @y, #6
+
+	mov r0, @allcolor 
+	ldui r5, #8
+loop:
+	addi  @y, @y, #1
+	shli  @allcolor, #4
+	@call cursor_read_pixel @x @y @color
+	or @allcolor, @allcolor,  @color			; 0x2000 | 0x4 => 0x2004
+	
+	dec  r5
+	beqz r5, #ret
+
+	seqi  r6, r5, #4			; did we print 4 times?
+	beqz  r6, #loop	
+
+	; jump over cursor center
+	addi  @y, @y, #3
+	ldui  r5, #4		; restart
+	jmp #loop
+
+ret:
+	store @allcolor, r0, *d*cursor_y_color_last				; Color zb: 0x2222 2222
+	@call ctx_restore
+  	jreg  @ra
+@}
+
+
+
+
+
+; IN SP -1: x
+;		-2: y
+; OUT	-3: color
+@code read_pixel {
+	;@code read_pixel 
+	@call ctx_save
+
+	@ldef x 	"r1"
+	@ldef y 	"r2"
+	@ldef gsa 	"r3"
+	@ldef color "r4"
+	@ldef t		"r5"
+	
+	ldui @color, #3
+	load @x, @sp, #-7
+	load @y, @sp, #-8
+
+	sgei  @t, @x, #2		;Abbruch, wenn Pixel nicht in 640*480
+	beqz  @t, #RET
+	sgei  @t, @y, #2
+	beqz  @t, #RET
+	slti  @t, @x, #638       
+	beqz  @t, #RET
+	slti  @t, @y, #478
+	beqz  @t, #RET
+
+	@call getGSA @x @y @gsa
+
+	out  @gsa, @VGAADR			; zu pixel springen
+	in   @color, @VGACOLOR
+
+RET:
+	store @color, @sp, #-9		;return value
+
+	@call ctx_restore
+	jreg @ra
+@}
+

@@ -1,0 +1,70 @@
+[*]
+[*] GTKWave Analyzer v3.3.95 (w)1999-2018 BSI
+[*] Tue Jan 22 17:58:31 2019
+[*]
+[dumpfile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\checkirq_tb.ghw"
+[dumpfile_mtime] "Tue Jan 22 17:40:06 2019"
+[dumpfile_size] 3696
+[savefile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\checkirq_tb.sav"
+[timestart] 252300000
+[size] 1920 1017
+[pos] -9 -9
+*-25.370050 439200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.checkirq_tb.
+[treeopen] top.checkirq_tb.uut.
+[sst_width] 222
+[signals_width] 213
+[sst_expanded] 1
+[sst_vpaned_height] 295
+@28
+top.checkirq_tb.uut.clk
+top.checkirq_tb.uut.reset
+[color] 2
+top.checkirq_tb.uut.enabled
+top.checkirq_tb.uut.dei
+top.checkirq_tb.uut.eni
+@200
+-interrupts
+@28
+top.checkirq_tb.uut.buf_xmemir
+top.checkirq_tb.uut.buf_xnair
+top.checkirq_tb.uut.xperintr
+top.checkirq_tb.uut.buf_swir
+top.checkirq_tb.uut.xmem_ack
+top.checkirq_tb.uut.xna_ack
+top.checkirq_tb.uut.sw_ack
+@200
+-  
+-output
+@28
+[color] 2
+top.checkirq_tb.uut.reti
+@24
+[color] 2
+#{top.checkirq_tb.retilvl[2:0]} top.checkirq_tb.retilvl[2] top.checkirq_tb.retilvl[1] top.checkirq_tb.retilvl[0]
+@30
+[color] 7
+#{top.checkirq_tb.uut.reqlvl[2:0]} top.checkirq_tb.uut.reqlvl[2] top.checkirq_tb.uut.reqlvl[1] top.checkirq_tb.uut.reqlvl[0]
+[color] 5
+#{top.checkirq_tb.curlvl[2:0]} top.checkirq_tb.curlvl[2] top.checkirq_tb.curlvl[1] top.checkirq_tb.curlvl[0]
+@28
+top.checkirq_tb.uut.fireintr
+top.checkirq_tb.uut.higherirl
+@25
+#{top.checkirq_tb.uut.newlvl[2:0]} top.checkirq_tb.uut.newlvl[2] top.checkirq_tb.uut.newlvl[1] top.checkirq_tb.uut.newlvl[0]
+@30
+#{top.checkirq_tb.selisra[2:0]} top.checkirq_tb.selisra[2] top.checkirq_tb.selisra[1] top.checkirq_tb.selisra[0]
+@28
+[color] 3
+top.checkirq_tb.uut.pcwrite
+[color] 7
+top.checkirq_tb.uut.intr
+@200
+-interrupt signals
+@28
+top.checkirq_tb.uut.swintr
+top.checkirq_tb.uut.xnaintr
+top.checkirq_tb.uut.xmemintr
+[pattern_trace] 1
+[pattern_trace] 0

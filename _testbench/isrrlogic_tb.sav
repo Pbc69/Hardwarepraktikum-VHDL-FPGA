@@ -1,0 +1,47 @@
+[*]
+[*] GTKWave Analyzer v3.3.95 (w)1999-2018 BSI
+[*] Mon Dec 17 15:56:30 2018
+[*]
+[dumpfile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\isrrlogic_tb.ghw"
+[dumpfile_mtime] "Mon Dec 17 15:53:49 2018"
+[dumpfile_size] 2416
+[savefile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\isrrlogic_tb.sav"
+[timestart] 84700000
+[size] 1920 1017
+[pos] -1929 -9
+*-24.520048 179800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.isrrlogic_tb.
+[treeopen] top.isrrlogic_tb.uut.
+[sst_width] 211
+[signals_width] 237
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@28
+top.isrrlogic_tb.uut.clk
+top.isrrlogic_tb.uut.reset
+@30
+#{top.isrrlogic_tb.uut.curlvl[2:0]} top.isrrlogic_tb.uut.curlvl[2] top.isrrlogic_tb.uut.curlvl[1] top.isrrlogic_tb.uut.curlvl[0]
+@22
+#{top.isrrlogic_tb.uut.pcnext[11:0]} top.isrrlogic_tb.uut.pcnext[11] top.isrrlogic_tb.uut.pcnext[10] top.isrrlogic_tb.uut.pcnext[9] top.isrrlogic_tb.uut.pcnext[8] top.isrrlogic_tb.uut.pcnext[7] top.isrrlogic_tb.uut.pcnext[6] top.isrrlogic_tb.uut.pcnext[5] top.isrrlogic_tb.uut.pcnext[4] top.isrrlogic_tb.uut.pcnext[3] top.isrrlogic_tb.uut.pcnext[2] top.isrrlogic_tb.uut.pcnext[1] top.isrrlogic_tb.uut.pcnext[0]
+@28
+[color] 2
+top.isrrlogic_tb.uut.reti
+[color] 3
+top.isrrlogic_tb.uut.intr
+@29
+[color] 1
+top.isrrlogic_tb.uut.pcwrite
+@22
+#{top.isrrlogic_tb.uut.reg[0][14:0]} top.isrrlogic_tb.uut.reg[0][14] top.isrrlogic_tb.uut.reg[0][13] top.isrrlogic_tb.uut.reg[0][12] top.isrrlogic_tb.uut.reg[0][11] top.isrrlogic_tb.uut.reg[0][10] top.isrrlogic_tb.uut.reg[0][9] top.isrrlogic_tb.uut.reg[0][8] top.isrrlogic_tb.uut.reg[0][7] top.isrrlogic_tb.uut.reg[0][6] top.isrrlogic_tb.uut.reg[0][5] top.isrrlogic_tb.uut.reg[0][4] top.isrrlogic_tb.uut.reg[0][3] top.isrrlogic_tb.uut.reg[0][2] top.isrrlogic_tb.uut.reg[0][1] top.isrrlogic_tb.uut.reg[0][0]
+#{top.isrrlogic_tb.uut.reg[1][14:0]} top.isrrlogic_tb.uut.reg[1][14] top.isrrlogic_tb.uut.reg[1][13] top.isrrlogic_tb.uut.reg[1][12] top.isrrlogic_tb.uut.reg[1][11] top.isrrlogic_tb.uut.reg[1][10] top.isrrlogic_tb.uut.reg[1][9] top.isrrlogic_tb.uut.reg[1][8] top.isrrlogic_tb.uut.reg[1][7] top.isrrlogic_tb.uut.reg[1][6] top.isrrlogic_tb.uut.reg[1][5] top.isrrlogic_tb.uut.reg[1][4] top.isrrlogic_tb.uut.reg[1][3] top.isrrlogic_tb.uut.reg[1][2] top.isrrlogic_tb.uut.reg[1][1] top.isrrlogic_tb.uut.reg[1][0]
+#{top.isrrlogic_tb.uut.reg[2][14:0]} top.isrrlogic_tb.uut.reg[2][14] top.isrrlogic_tb.uut.reg[2][13] top.isrrlogic_tb.uut.reg[2][12] top.isrrlogic_tb.uut.reg[2][11] top.isrrlogic_tb.uut.reg[2][10] top.isrrlogic_tb.uut.reg[2][9] top.isrrlogic_tb.uut.reg[2][8] top.isrrlogic_tb.uut.reg[2][7] top.isrrlogic_tb.uut.reg[2][6] top.isrrlogic_tb.uut.reg[2][5] top.isrrlogic_tb.uut.reg[2][4] top.isrrlogic_tb.uut.reg[2][3] top.isrrlogic_tb.uut.reg[2][2] top.isrrlogic_tb.uut.reg[2][1] top.isrrlogic_tb.uut.reg[2][0]
+#{top.isrrlogic_tb.uut.reg[3][14:0]} top.isrrlogic_tb.uut.reg[3][14] top.isrrlogic_tb.uut.reg[3][13] top.isrrlogic_tb.uut.reg[3][12] top.isrrlogic_tb.uut.reg[3][11] top.isrrlogic_tb.uut.reg[3][10] top.isrrlogic_tb.uut.reg[3][9] top.isrrlogic_tb.uut.reg[3][8] top.isrrlogic_tb.uut.reg[3][7] top.isrrlogic_tb.uut.reg[3][6] top.isrrlogic_tb.uut.reg[3][5] top.isrrlogic_tb.uut.reg[3][4] top.isrrlogic_tb.uut.reg[3][3] top.isrrlogic_tb.uut.reg[3][2] top.isrrlogic_tb.uut.reg[3][1] top.isrrlogic_tb.uut.reg[3][0]
+@30
+[color] 7
+#{top.isrrlogic_tb.uut.retilvl[2:0]} top.isrrlogic_tb.uut.retilvl[2] top.isrrlogic_tb.uut.retilvl[1] top.isrrlogic_tb.uut.retilvl[0]
+@22
+[color] 7
+#{top.isrrlogic_tb.uut.isrr[11:0]} top.isrrlogic_tb.uut.isrr[11] top.isrrlogic_tb.uut.isrr[10] top.isrrlogic_tb.uut.isrr[9] top.isrrlogic_tb.uut.isrr[8] top.isrrlogic_tb.uut.isrr[7] top.isrrlogic_tb.uut.isrr[6] top.isrrlogic_tb.uut.isrr[5] top.isrrlogic_tb.uut.isrr[4] top.isrrlogic_tb.uut.isrr[3] top.isrrlogic_tb.uut.isrr[2] top.isrrlogic_tb.uut.isrr[1] top.isrrlogic_tb.uut.isrr[0]
+[pattern_trace] 1
+[pattern_trace] 0

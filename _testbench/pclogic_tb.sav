@@ -1,0 +1,50 @@
+[*]
+[*] GTKWave Analyzer v3.3.95 (w)1999-2018 BSI
+[*] Mon Dec 17 14:47:59 2018
+[*]
+[dumpfile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\pclogic_tb.ghw"
+[dumpfile_mtime] "Mon Dec 17 14:46:55 2018"
+[dumpfile_size] 3826
+[savefile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\pclogic_tb.sav"
+[timestart] 0
+[size] 1920 1017
+[pos] -1987 12
+*-25.116938 219200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.pclogic_tb.
+[treeopen] top.pclogic_tb.uut.
+[sst_width] 211
+[signals_width] 229
+[sst_expanded] 1
+[sst_vpaned_height] 393
+@28
+top.pclogic_tb.clk
+top.pclogic_tb.reset
+top.pclogic_tb.intr
+[color] 3
+#{top.pclogic_tb.pccontr[5:0]} top.pclogic_tb.pccontr[5] top.pclogic_tb.pccontr[4] top.pclogic_tb.pccontr[3] top.pclogic_tb.pccontr[2] top.pclogic_tb.pccontr[1] top.pclogic_tb.pccontr[0]
+@22
+#{top.pclogic_tb.uut.irqmux[11:0]} top.pclogic_tb.uut.irqmux[11] top.pclogic_tb.uut.irqmux[10] top.pclogic_tb.uut.irqmux[9] top.pclogic_tb.uut.irqmux[8] top.pclogic_tb.uut.irqmux[7] top.pclogic_tb.uut.irqmux[6] top.pclogic_tb.uut.irqmux[5] top.pclogic_tb.uut.irqmux[4] top.pclogic_tb.uut.irqmux[3] top.pclogic_tb.uut.irqmux[2] top.pclogic_tb.uut.irqmux[1] top.pclogic_tb.uut.irqmux[0]
+#{top.pclogic_tb.uut.pcmux[11:0]} top.pclogic_tb.uut.pcmux[11] top.pclogic_tb.uut.pcmux[10] top.pclogic_tb.uut.pcmux[9] top.pclogic_tb.uut.pcmux[8] top.pclogic_tb.uut.pcmux[7] top.pclogic_tb.uut.pcmux[6] top.pclogic_tb.uut.pcmux[5] top.pclogic_tb.uut.pcmux[4] top.pclogic_tb.uut.pcmux[3] top.pclogic_tb.uut.pcmux[2] top.pclogic_tb.uut.pcmux[1] top.pclogic_tb.uut.pcmux[0]
+@28
+#{top.pclogic_tb.uut.selpc[1:0]} top.pclogic_tb.uut.selpc[1] top.pclogic_tb.uut.selpc[0]
+[color] 3
+top.pclogic_tb.ov
+[color] 3
+top.pclogic_tb.zero
+@22
+#{top.pclogic_tb.isra[11:0]} top.pclogic_tb.isra[11] top.pclogic_tb.isra[10] top.pclogic_tb.isra[9] top.pclogic_tb.isra[8] top.pclogic_tb.isra[7] top.pclogic_tb.isra[6] top.pclogic_tb.isra[5] top.pclogic_tb.isra[4] top.pclogic_tb.isra[3] top.pclogic_tb.isra[2] top.pclogic_tb.isra[1] top.pclogic_tb.isra[0]
+#{top.pclogic_tb.isrr[11:0]} top.pclogic_tb.isrr[11] top.pclogic_tb.isrr[10] top.pclogic_tb.isrr[9] top.pclogic_tb.isrr[8] top.pclogic_tb.isrr[7] top.pclogic_tb.isrr[6] top.pclogic_tb.isrr[5] top.pclogic_tb.isrr[4] top.pclogic_tb.isrr[3] top.pclogic_tb.isrr[2] top.pclogic_tb.isrr[1] top.pclogic_tb.isrr[0]
+#{top.pclogic_tb.pcnext[11:0]} top.pclogic_tb.pcnext[11] top.pclogic_tb.pcnext[10] top.pclogic_tb.pcnext[9] top.pclogic_tb.pcnext[8] top.pclogic_tb.pcnext[7] top.pclogic_tb.pcnext[6] top.pclogic_tb.pcnext[5] top.pclogic_tb.pcnext[4] top.pclogic_tb.pcnext[3] top.pclogic_tb.pcnext[2] top.pclogic_tb.pcnext[1] top.pclogic_tb.pcnext[0]
+[color] 6
+#{top.pclogic_tb.uut.pcreg[11:0]} top.pclogic_tb.uut.pcreg[11] top.pclogic_tb.uut.pcreg[10] top.pclogic_tb.uut.pcreg[9] top.pclogic_tb.uut.pcreg[8] top.pclogic_tb.uut.pcreg[7] top.pclogic_tb.uut.pcreg[6] top.pclogic_tb.uut.pcreg[5] top.pclogic_tb.uut.pcreg[4] top.pclogic_tb.uut.pcreg[3] top.pclogic_tb.uut.pcreg[2] top.pclogic_tb.uut.pcreg[1] top.pclogic_tb.uut.pcreg[0]
+@23
+#{top.pclogic_tb.pcakt[11:0]} top.pclogic_tb.pcakt[11] top.pclogic_tb.pcakt[10] top.pclogic_tb.pcakt[9] top.pclogic_tb.pcakt[8] top.pclogic_tb.pcakt[7] top.pclogic_tb.pcakt[6] top.pclogic_tb.pcakt[5] top.pclogic_tb.pcakt[4] top.pclogic_tb.pcakt[3] top.pclogic_tb.pcakt[2] top.pclogic_tb.pcakt[1] top.pclogic_tb.pcakt[0]
+@22
+#{top.pclogic_tb.pcinc[11:0]} top.pclogic_tb.pcinc[11] top.pclogic_tb.pcinc[10] top.pclogic_tb.pcinc[9] top.pclogic_tb.pcinc[8] top.pclogic_tb.pcinc[7] top.pclogic_tb.pcinc[6] top.pclogic_tb.pcinc[5] top.pclogic_tb.pcinc[4] top.pclogic_tb.pcinc[3] top.pclogic_tb.pcinc[2] top.pclogic_tb.pcinc[1] top.pclogic_tb.pcinc[0]
+#{top.pclogic_tb.pcnew[11:0]} top.pclogic_tb.pcnew[11] top.pclogic_tb.pcnew[10] top.pclogic_tb.pcnew[9] top.pclogic_tb.pcnew[8] top.pclogic_tb.pcnew[7] top.pclogic_tb.pcnew[6] top.pclogic_tb.pcnew[5] top.pclogic_tb.pcnew[4] top.pclogic_tb.pcnew[3] top.pclogic_tb.pcnew[2] top.pclogic_tb.pcnew[1] top.pclogic_tb.pcnew[0]
+@28
+[color] 6
+top.pclogic_tb.pcwrite
+[pattern_trace] 1
+[pattern_trace] 0

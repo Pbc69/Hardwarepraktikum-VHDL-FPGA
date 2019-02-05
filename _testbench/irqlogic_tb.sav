@@ -1,0 +1,67 @@
+[*]
+[*] GTKWave Analyzer v3.3.95 (w)1999-2018 BSI
+[*] Wed Jan 23 09:13:44 2019
+[*]
+[dumpfile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\irqlogic_tb.ghw"
+[dumpfile_mtime] "Wed Jan 23 09:08:45 2019"
+[dumpfile_size] 4791
+[savefile] "C:\GIT\Hardware Praktikum\hadesXI_18\_testbench\irqlogic_tb.sav"
+[timestart] 311000000
+[size] 1920 1017
+[pos] -1921 2
+*-24.924971 436500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.irqlogic_tb.
+[treeopen] top.irqlogic_tb.uut.
+[treeopen] top.irqlogic_tb.uut.checkirq1.
+[sst_width] 257
+[signals_width] 229
+[sst_expanded] 1
+[sst_vpaned_height] 300
+@28
+top.irqlogic_tb.uut.clk
+top.irqlogic_tb.uut.reset
+@30
+#{top.irqlogic_tb.uut.sisalvl[1:0]} top.irqlogic_tb.uut.sisalvl[1] top.irqlogic_tb.uut.sisalvl[0]
+@28
+top.irqlogic_tb.uut.xmemintr
+top.irqlogic_tb.uut.swintr
+@22
+#{top.irqlogic_tb.uut.pcnew[11:0]} top.irqlogic_tb.uut.pcnew[11] top.irqlogic_tb.uut.pcnew[10] top.irqlogic_tb.uut.pcnew[9] top.irqlogic_tb.uut.pcnew[8] top.irqlogic_tb.uut.pcnew[7] top.irqlogic_tb.uut.pcnew[6] top.irqlogic_tb.uut.pcnew[5] top.irqlogic_tb.uut.pcnew[4] top.irqlogic_tb.uut.pcnew[3] top.irqlogic_tb.uut.pcnew[2] top.irqlogic_tb.uut.pcnew[1] top.irqlogic_tb.uut.pcnew[0]
+#{top.irqlogic_tb.uut.pcnext[11:0]} top.irqlogic_tb.uut.pcnext[11] top.irqlogic_tb.uut.pcnext[10] top.irqlogic_tb.uut.pcnext[9] top.irqlogic_tb.uut.pcnext[8] top.irqlogic_tb.uut.pcnext[7] top.irqlogic_tb.uut.pcnext[6] top.irqlogic_tb.uut.pcnext[5] top.irqlogic_tb.uut.pcnext[4] top.irqlogic_tb.uut.pcnext[3] top.irqlogic_tb.uut.pcnext[2] top.irqlogic_tb.uut.pcnext[1] top.irqlogic_tb.uut.pcnext[0]
+@28
+#{top.irqlogic_tb.uut.pccontr[4:0]} top.irqlogic_tb.uut.pccontr[4] top.irqlogic_tb.uut.pccontr[3] top.irqlogic_tb.uut.pccontr[2] top.irqlogic_tb.uut.pccontr[1] top.irqlogic_tb.uut.pccontr[0]
+@200
+-ISRA Logic
+@30
+#{top.irqlogic_tb.uut.isra_logic.selisra[2:0]} top.irqlogic_tb.uut.isra_logic.selisra[2] top.irqlogic_tb.uut.isra_logic.selisra[1] top.irqlogic_tb.uut.isra_logic.selisra[0]
+@24
+[color] 3
+#{top.irqlogic_tb.uut.isra_logic.isra[11:0]} top.irqlogic_tb.uut.isra_logic.isra[11] top.irqlogic_tb.uut.isra_logic.isra[10] top.irqlogic_tb.uut.isra_logic.isra[9] top.irqlogic_tb.uut.isra_logic.isra[8] top.irqlogic_tb.uut.isra_logic.isra[7] top.irqlogic_tb.uut.isra_logic.isra[6] top.irqlogic_tb.uut.isra_logic.isra[5] top.irqlogic_tb.uut.isra_logic.isra[4] top.irqlogic_tb.uut.isra_logic.isra[3] top.irqlogic_tb.uut.isra_logic.isra[2] top.irqlogic_tb.uut.isra_logic.isra[1] top.irqlogic_tb.uut.isra_logic.isra[0]
+@200
+-ISRR Logic
+@24
+[color] 3
+#{top.irqlogic_tb.uut.isrr[11:0]} top.irqlogic_tb.uut.isrr[11] top.irqlogic_tb.uut.isrr[10] top.irqlogic_tb.uut.isrr[9] top.irqlogic_tb.uut.isrr[8] top.irqlogic_tb.uut.isrr[7] top.irqlogic_tb.uut.isrr[6] top.irqlogic_tb.uut.isrr[5] top.irqlogic_tb.uut.isrr[4] top.irqlogic_tb.uut.isrr[3] top.irqlogic_tb.uut.isrr[2] top.irqlogic_tb.uut.isrr[1] top.irqlogic_tb.uut.isrr[0]
+@200
+-Check IRQ
+@28
+top.irqlogic_tb.uut.checkirq1.enabled
+[color] 1
+top.irqlogic_tb.uut.checkirq1.intr
+@24
+[color] 3
+#{top.irqlogic_tb.uut.checkirq1.curlvl[2:0]} top.irqlogic_tb.uut.checkirq1.curlvl[2] top.irqlogic_tb.uut.checkirq1.curlvl[1] top.irqlogic_tb.uut.checkirq1.curlvl[0]
+#{top.irqlogic_tb.uut.checkirq1.reqlvl[2:0]} top.irqlogic_tb.uut.checkirq1.reqlvl[2] top.irqlogic_tb.uut.checkirq1.reqlvl[1] top.irqlogic_tb.uut.checkirq1.reqlvl[0]
+#{top.irqlogic_tb.uut.checkirq1.retilvl[2:0]} top.irqlogic_tb.uut.checkirq1.retilvl[2] top.irqlogic_tb.uut.checkirq1.retilvl[1] top.irqlogic_tb.uut.checkirq1.retilvl[0]
+@30
+#{top.irqlogic_tb.uut.checkirq1.selisra[2:0]} top.irqlogic_tb.uut.checkirq1.selisra[2] top.irqlogic_tb.uut.checkirq1.selisra[1] top.irqlogic_tb.uut.checkirq1.selisra[0]
+@28
+top.irqlogic_tb.uut.checkirq1.pcwrite
+top.irqlogic_tb.uut.checkirq1.reti
+top.irqlogic_tb.uut.checkirq1.sw_ack
+top.irqlogic_tb.uut.checkirq1.swintr
+@29
+top.irqlogic_tb.uut.checkirq1.buf_swir
+[pattern_trace] 1
+[pattern_trace] 0
