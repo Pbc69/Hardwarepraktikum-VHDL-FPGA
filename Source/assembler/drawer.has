@@ -40,7 +40,7 @@ drawline:
 
 clearscreen:
 	load  r1, r0, *d*can_clear_screen 
-	beqz r1, #ret						; can_clear_screen = 0 ? ret
+	beqz  r1, #ret						; can_clear_screen = 0 ? ret
 
 	store  r0, r0, *d*can_clear_screen  ;can_clear_screen = 0
 
@@ -48,7 +48,7 @@ clearscreen:
 	jal @ra, *updateFrame
 	
 	; redraw cursor
-	store r0, r0 *d*mouse_x_next	
+	store r0, r0, *d*mouse_x_next	
 	;ldui r1, #1
 	;store r1, r0, *d*MOUSE_MOVED
 	jmp #ret
