@@ -35,7 +35,7 @@ return:							;return from Function
 
 blocked:						
 		LDUI r1, #0xFFFF		;interrupt status mask
-		out r1, #68				;reset interruot status
+		out r1, #68				;reset interrupt status
 	jmp #return
 
 @}

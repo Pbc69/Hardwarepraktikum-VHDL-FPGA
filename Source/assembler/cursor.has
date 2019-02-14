@@ -10,21 +10,21 @@
 
 
 @MAC cursor_read_pixel {
-	addi   @sp, #3
-	store  @1, @sp, #-1			;x
-	store  @2, @sp, #-2			;y
-	jal @ra, *read_pixel
-	load  @3, @sp, #-3			; return value color
-	subi  @sp, #3
+	addi	@sp, #3
+	store  	@1, @sp, #-1			;x
+	store  	@2, @sp, #-2			;y
+	jal    	@ra, *read_pixel
+	load  	@3, @sp, #-3			; return value color
+	subi   	@sp, #3
 @}
 
 @MAC cursor_draw_pixel {
-	addi   @sp, #3
-	store  @1, @sp, #-1			;x
-	store  @2, @sp, #-2			;y
-	store  @3, @sp, #-3			;color
-	jal @ra, *drawPixel
-	subi   @sp, #3
+	addi	@sp, #3
+	store  	@1, @sp, #-1			;x
+	store  	@2, @sp, #-2			;y
+	store  	@3, @sp, #-3			;color
+	jal 	@ra, *drawPixel
+	subi   	@sp, #3
 @}
 
 ; Wenn screen gecleart wird, muss cursor neu initalisiert werden
