@@ -61,21 +61,30 @@ notEAST:
 @}
 
 @code LoadColorChange{
-	@CALL ctx_save				;save context
+	;LoadColorChange save context
+	@CALL ctx_save				
 
-	in r1, #65					;load switch status
-	andi r1, r1, #0x000F		;masking to switch status only
-	store r1, @NULL, *d*CURCOLOR		
+	@ldef color "r1"
+	@ldef led "r2"
+
+
+	in 		@color, #65					;load switch status
+	andi 	@color, #0xF				;masking to switch status only
+	store 	@color, @NULL, *d*CURCOLOR		
+
+	mov 	r0, @led					; led = 0
+	bnez 	@color, #noBlinkLed			; color = black(0) > LED0 blinking
+	ori 	@led, #1					; 
+	shli 	@led, #16					; shift LED0 left for blinking led
+	ori 	@led, #1					; enable LED0
+noBlinkLed:
 	
-	IN r2, #64					;load LED Status
-	SHRI r3, r2, #16			;shift left to save blink status in r3
-	SHLI r3, r3, #16			;shift back to bits 31..16
-	ANDI r2, r2, #0xFFF0		;masking LED Status of SW3..0 only
-	OR r1, r1, r2				;combine non changeing bits with updated bits
-	OR r3, r3, r1				;combine upper and lower bits 
-	OUT r3, #64					;write out the updated status
+	shli 	@color, #1
+	or 		@led, @color				; combine non changeing bits with updated bits
+	out 	@led, #64					; update LEDs
 
-	LDUI r1, #0x0F				;Reset mask for interrupt-status bits
+
+	LDUI r1, #0xF				;Reset mask for interrupt-status bits
 	OUT r1, #68					;Write out the reset mask
 
 	jal @ra, *updateFrame
@@ -116,49 +125,6 @@ notEAST:
 	LDUI r1, #0x10				;Reset mask for interrupt-status bits
 	OUT r1, #68					;Write out the reset mask
 
-	@call ctx_restore
-	jreg @ra
-@}
-
-@code busyWaitUnblock{
-
-	; @code busyWaitUnblock - save context
-	@CALL ctx_save
-
-;busyWait:
-	LOAD r1, @NULL, *d*BLOCKED	;store status
-	BEQZ r1, #notblocked
-busyWait:
-	IN r1, #65					;load switch status
-	ANDI r1, r1, #0x0010		;masking to switch status only
-	SHRI r2, r1, #4				;shift status bit to bit 0
-	STORE r2, @NULL, *d*BLOCKED	;store status
-	BNEZ r2, #busyWait			;busy waiting loop till Unblocked
-
-	;;;;;;;;;;;;;;;;;;;;;;;;;
-	;;	ReInit status!!
-	;;;;;;;;;;;;;;;;;;;;;;;;;
-	jal @ra, *LoadColorChange	;lead/update current color from switches 
-	jal @ra, *clearButtons		;Clear button status if pressed while blocked
-
-	;LDUI r1, #0xFFFF
-	;OUT r1, #129
-
-
-	;jal @ra, *ps2_init
-	; Init the PS2 for mouse
-	;jal @ra, *ps2_init_mouse
-	jal @ra, *mouse_clear_buffer
-
-
-	;; TODO 
-	;	- clear mouse position -> no jumping
-	;	- clear pressed buttons !!
-	;	- ...	
-	
-	
-notblocked:
-	ENI							;Enable Interupts
 	@call ctx_restore
 	jreg @ra
 @}
