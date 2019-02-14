@@ -1,12 +1,12 @@
 
 ; MouseEvent
-@data mouse_ctr    {#100 @}			; Index MouseData
+@data mouse_ctr    {#0 @}			; Index MouseData
 @data mouse_data   {#1, #2, #3 @}	; 3bytes vom Maus Output - Info/x/y
 @data mouse_x      {#320 @}			; X Absolut
 @data mouse_y      {#240 @}			; Y Absolut
 @data mouse_x_next      {#0 @}			; X Absolut
 @data mouse_y_next      {#0 @}			; Y Absolut
-@data mouse_buttons      {#1337 @}	; 3 bits: 1bit=left, 2,=right, 3.=mid
+@data mouse_buttons      {#0 @}	; 3 bits: 1bit=left, 2,=right, 3.=mid
 @data mouse_sensitivity 	{#2 @}	; <unused>
 
 
@@ -27,44 +27,10 @@
 @def ps2_status 	"#129"
 @def ps2_control 	"#130"
 
-
-
-@code mouse_clearvars {
-	; @code mouse_clearvars
-	@call ctx_save
-
-	
-	store r0, r0, *d*mouse_ctr
-	store r0, r0, *d*mouse_buttons
-
-	; restore context & return
-	@call ctx_restore
-	jreg @ra
-@}
-
-
-; In interrupt routine. Diese muss aufgerufen werden, wenn die Maus ein interrupt auslöst
-@code mouse_isr {
-	@call ctx_save
-
-	jal @ra, *read_mouse
-
-	; reset mouse 
-  	;ldui r1, #0xF4
-  	;out  r1, @ps2_control		; xbus[ps2_control] = 0xF4
-
-  	reti
-
-	@call ctx_restore
-  	jreg  @ra
-@}
-
-
-
 ; Lese von PS2 solange bis Buffer leer ist => Maus-Daten geleert
 @code mouse_clear_buffer {
-  ; @code read_mouse - save context
-  @call ctx_save
+  	; @code read_mouse - save context
+  	@call ctx_save
 
 read:
 	in    r1, @ps2_status		; r1 = xbus[ps2_status]
@@ -79,29 +45,46 @@ read:
 
 empty:
 
-  jal @ra, *mouse_clearvars
+	store r0, r0, *d*mouse_buttons	  ; clear m-buttons
 
-  ; restore context & return
-  @call ctx_restore
-  jreg  @ra
+  	; restore context & return
+  	@call ctx_restore
+  	jreg  @ra
 @}
 
 
+; In interrupt routine. Diese muss aufgerufen werden, wenn die Maus ein interrupt (#1) auslöst
+@code mouse_isr {
+	@call ctx_save
+
+	jal @ra, *read_mouse
+
+	; reset mouse 
+  	;ldui r1, #0xF4
+  	;out  r1, @ps2_control		; xbus[ps2_control] = 0xF4
+
+	@call ctx_restore
+	jreg  @ra
+@}
+
+
+;------------ READ MOUSE -----------------
 ; Prüfe ob neue MausDaten vorhanden und speichere diese ab
 @code read_mouse {
   ; @code read_mouse - save context
   @call ctx_save
 
 	; is there a new mouseposition from interrupt
-	load r1, r0, *d*mouse_x_next;
+	load r1, r0, *d*mouse_x_next
 	beqz r1, #read
 
-	store r1, r0,  *d*mouse_x;
-	load  r1, r0, *d*mouse_y_next;
-	store r1, r0,  *d*mouse_y;
-	; clear 
-	store r0, r0,  *d*mouse_x_next;
-	store r0, r0,  *d*mouse_y_next;
+	store r1, r0,  *d*mouse_x
+	load  r1, r0,  *d*mouse_y_next
+	store r1, r0,  *d*mouse_y
+	
+	; clear mouse data from interrupt routine
+	store r0, r0,  *d*mouse_x_next
+	store r0, r0,  *d*mouse_y_next
 
 read:
 	in    r1, @ps2_status		; r1 = xbus[ps2_status]

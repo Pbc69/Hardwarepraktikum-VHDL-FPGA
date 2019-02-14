@@ -22,7 +22,6 @@ loop:
 	LOAD r1, @NULL, *d*BLOCKED			;load blocking status
 	BNEZ r1, #loop						;jump back if blocked "busyWait"
 
-
 	jal @ra, *read_mouse				; 0. read mouse
 
 	;jal @ra, *fpsHandling				;reworked fps check
@@ -51,7 +50,6 @@ loop:
 
 	jal @ra, *ps2_init			; init the PS2 for mouse
 	jal @ra, *ps2_init_mouse
-	jal @ra, *mouse_clearvars
 
 	jal @ra, *clrScreen			; init screen and frame color
 	jal @ra, *LoadColorChange		
