@@ -20,23 +20,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 @MAC ctx_save {
-	store r1, @sp, #0
-	store r2, @sp, #1
-	store r3, @sp, #2
-	store r4, @sp, #3
-	store r5, @sp, #4
-	store r6, @sp, #5
 	addi  @sp, @sp, #6
+	store r1, @sp, #-1
+	store r2, @sp, #-2
+	store r3, @sp, #-3
+	store r4, @sp, #-4
+	store r5, @sp, #-5
+	store r6, @sp, #-6   
 @}
 
 @MAC ctx_restore {
+	load  r6, @sp, #-6
+	load  r5, @sp, #-5
+	load  r4, @sp, #-4
+	load  r3, @sp, #-3
+	load  r2, @sp, #-2
+	load  r1, @sp, #-1
 	subi  @sp, @sp, #6
-	load  r6, @sp, #5
-	load  r5, @sp, #4
-	load  r4, @sp, #3
-	load  r3, @sp, #2
-	load  r2, @sp, #1
-	load  r1, @sp, #0
 @}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
