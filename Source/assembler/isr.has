@@ -5,7 +5,7 @@
 	@CALL ctx_save
 
 	IN r1, #68 					;load interrup-status register of xConsole
-	ANDI r2, r1, #0x0010		;masking to only block switch interrupt status
+	ANDI r2, r1, #0x10			;masking to only block switch interrupt status
 	BEQZ r2, #NoBlockingChange	;jump if block status haven't changed
 		jal @ra, *CheckBlockingChange
 NoBlockingChange:	
@@ -47,9 +47,9 @@ blocked:
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;;  Init Switch and Button interrupts
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ldui r1, #000000000001111b ; enable Button interrupt for north, east, south, west
-  	shli r1, r1, #16
-  	ori r1, #0000000000011111b	; enable Switch interrapts sw5..0
+	ldui r1, #1111b ; enable Button interrupt for north, east, south, west
+  	shli r1, #16
+  	ori  r1, #11111b	; enable Switch interrapts sw5..0
   	out  r1, #67
 
 	; enable mouse interrupt
